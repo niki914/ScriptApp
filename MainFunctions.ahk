@@ -79,9 +79,11 @@ BingTranslate(text)
         . RegExReplace(langto, "S)-.*$")
         . "&text=" text
 
-    response := Web_Get(url)
+    response := Filter(Web_Get(url), "S)^<[^>]+>(.*?)<\/string>$")
 
-    return Filter(response, "S)^<[^>]+>(.*?)<\/string>$")
+    If (!response)
+        Return "no response;)"
+    return response
 }
 
 Web_Get(url)
