@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lao", "Lao", "{EE7E8EAE-5E17-4673-8A16-0E9440652C69}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AHKs-master", "AHKs-master", "{F6B3FBCF-D9B3-45FF-ACE5-A7348339FBE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thirdParty", "thirdParty", "{C25C3692-88A4-4CD9-A80C-AFE594E66EA7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ipc", "ipc", "{54A97363-F33A-4E02-8062-683EB7F9CFDD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DotNet", "DotNet", "{6F57B5C3-E6AA-4790-9F82-7F2EB11BF0CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPC_Test", "Lao\AHKs-master\thirdParty\ipc\DotNet\IPC_Test\IPC_Test.csproj", "{65D5A9E6-1EFC-4163-A300-08BE7EFED505}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65D5A9E6-1EFC-4163-A300-08BE7EFED505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D5A9E6-1EFC-4163-A300-08BE7EFED505}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D5A9E6-1EFC-4163-A300-08BE7EFED505}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D5A9E6-1EFC-4163-A300-08BE7EFED505}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F6B3FBCF-D9B3-45FF-ACE5-A7348339FBE2} = {EE7E8EAE-5E17-4673-8A16-0E9440652C69}
+		{C25C3692-88A4-4CD9-A80C-AFE594E66EA7} = {F6B3FBCF-D9B3-45FF-ACE5-A7348339FBE2}
+		{54A97363-F33A-4E02-8062-683EB7F9CFDD} = {C25C3692-88A4-4CD9-A80C-AFE594E66EA7}
+		{6F57B5C3-E6AA-4790-9F82-7F2EB11BF0CF} = {54A97363-F33A-4E02-8062-683EB7F9CFDD}
+		{65D5A9E6-1EFC-4163-A300-08BE7EFED505} = {6F57B5C3-E6AA-4790-9F82-7F2EB11BF0CF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {43421B06-9D13-4821-B2CE-E214B88F74F4}
+	EndGlobalSection
+EndGlobal

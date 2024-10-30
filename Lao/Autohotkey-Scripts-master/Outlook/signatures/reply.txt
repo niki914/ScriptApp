@@ -1,0 +1,7 @@
+Sincerely,
+_givenName_ _sn_
+_title_
+COMPANY Name
+_telephoneNumber_
+800.555.5555 ext. _ipPhone_
+

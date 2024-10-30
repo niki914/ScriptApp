@@ -1,0 +1,15 @@
+
+Truely yours,
+
+_givenName_ _sn_
+_title_
+My Company Name
+
+_mail_
+_telephoneNumber_
+800.555.5555 ext. _ipPhone_
+
+
+My super company tagline here
+
+_info_
