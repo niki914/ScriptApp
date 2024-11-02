@@ -1,4 +1,5 @@
-#Include MainFunctions.ahk
+﻿#Include MainFunctions.ahk
+#Include DllUtils.ahk
 
 global parentPath := "D:\A_BACKUPS\AhkBackups\"
 global dudesPath := A_AppData . "\WannaTakeThisDownTown"
@@ -30,8 +31,11 @@ BackUp()
     cmd_ZipDudes := ""
     cmd_ZipScript := ""
 
-    path_WinRAR := SearchFile_EveryThing("winrar", "exe")
-    path_7Z := SearchFile_EveryThing("7z", "exe")
+    EveryThing_Set("winRAR.exe")
+    path_WinRAR := Everything_Query()[0]
+
+    EveryThing_Set("7z.exe")
+    path_7Z := Everything_Query()[0]
 
     If (path_WinRAR)
     {
@@ -46,5 +50,9 @@ BackUp()
         cmd_ZipScript := CommandBuilder_7Z("SCRIPTS", scriptPath)
         RunWait, %path_7Z% %cmd_ZipDudes%, , Hide
         RunWait, %path_7Z% %cmd_ZipScript%, , Hide
+    }
+    Else
+    {
+        ShowSplashText("backup", "在您的设备上找不到 winRAR 或 7z, 无法备份", 2000)
     }
 }

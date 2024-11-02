@@ -1,16 +1,16 @@
-#Include MainFunctions.ahk
+Ôªø#Include MainFunctions.ahk
 
 global GDUT_SSID := "gdut"
 global RETRY_COUNT := 5
 
-GDUT()
+GDUT(notify := True)
 {
-    If(GDUT_TryConnect())
-        GDUT_TryLogin()
+    If(GDUT_TryConnect(notify))
+        GDUT_TryLogin(notify)
 }
 
-; ≥¢ ‘¡¨Ω” gdut
-GDUT_TryConnect()
+; Â∞ùËØïËøûÊé• gdut
+GDUT_TryConnect(notify := True)
 {
     count := RETRY_COUNT
 
@@ -19,16 +19,17 @@ GDUT_TryConnect()
         If (Wifi_IsConnected(GDUT_SSID))
             Return True
         If (Wifi_IsNear(GDUT_SSID))
-            If (Wifi_Connect(GDUT_SSID))
+            If (Wifi_Connect(GDUT_SSID, notify))
                 Return True
         count--
     }
 
-    ShowSplashText("GDUT", "failed to connect", 800)
-    Return False ; ∂‡¥Œ≥¢ ‘Œﬁπ˚
+    If (notify)
+        ShowSplashText("GDUT", "failed to connect", 800)
+    Return False ; Â§öÊ¨°Â∞ùËØïÊó†Êûú
 }
 
-GDUT_TryLogin()
+GDUT_TryLogin(notify := True)
 {
     count := RETRY_COUNT
 
@@ -44,7 +45,8 @@ GDUT_TryLogin()
 
             If (result)
             {
-                ShowSplashText("GDUT", GDUT_ParseMsg(result), 800)
+                If (notify)
+                    ShowSplashText("GDUT", GDUT_ParseMsg(result), 800)
                 Return True
             }
         }
@@ -54,8 +56,9 @@ GDUT_TryLogin()
         count--
     }
 
-    ShowSplashText("GDUT", "failed to login", 800)
-    Return False ; ∂‡¥Œ≥¢ ‘Œﬁπ˚
+    If (notify)
+        ShowSplashText("GDUT", "failed to login", 800)
+    Return False ; Â§öÊ¨°Â∞ùËØïÊó†Êûú
 }
 
 GDUT_ParseMsg(json)

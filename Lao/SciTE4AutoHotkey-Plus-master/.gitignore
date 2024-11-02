@@ -1,0 +1,28 @@
+
+/Compiler
+/UX
+/v2
+/整理项目
+AutoHotkey Website.url
+AutoHotkey.chm
+AutoHotkey.exe
+AutoHotkeyA32.exe
+AutoHotkeyU32.exe
+AutoHotkeyU64.exe
+Installer.ahk
+license.txt
+scintillua 最小测试环境.zip
+scite 5.2.2 这里是使用 lua 为 scite 做语法解析的最小测试环境.zip
+WindowSpy.ahk
+SciTE/user/lexers
+SciTE/user/_platform.properties
+SciTE/user/SciTE.session
+SciTE/user/SciTEDebug.ini
+SciTE/tools/AHK_Window_Info/AHK_Window_Info_v1.7.ini
+SciTE/tools/Structor/MSVC2022
+SciTE/tools/Structor/Structor.ini
+SciTE/tools/Structor/Verifier.ini
+SciTE/tools/AHK DllCall 终结者/settings.ini
+SciTE/tools/AHK DllCall 终结者/TODO.txt
+SciTE/中文帮助/AutoHotkey_CN_v2.chm
+todo.txt

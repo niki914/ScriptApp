@@ -1,15 +1,20 @@
-#Include DudeDealer.ahk
+ï»¿#Include DudeDealer.ahk
 #Include NetworkActions.ahk
 #Include MainFunctions.ahk
 #Include AutoBackup.ahk
-#Include Crypt.ahk
-#NoTrayIcon ; ²»ÏÔÊ¾Ğ¡Í¼±ê
+#Include DllUtils.ahk
 
-#SingleInstance force ; µ¥ÀıÄ£Ê½
+#Include Libs\Crypt.ahk
 
-global dudesPath := A_AppData . "\WannaTakeThisDownTown" ; ÅäÖÃÎÄ¼şµÄÂ·¾¶
-global password := PasswordInput() ; ÒªÇóÊäÈëÃÜÂë
-; global password :=  ; ÒªÇóÊäÈëÃÜÂë
+#NoTrayIcon ; ä¸æ˜¾ç¤ºå°å›¾æ ‡
+
+#SingleInstance force ; å•ä¾‹æ¨¡å¼
+
+global dudesPath := A_AppData . "\WannaTakeThisDownTown" ; é…ç½®æ–‡ä»¶çš„è·¯å¾„
+global password := PasswordInput() ; è¦æ±‚è¾“å…¥å¯†ç 
+; global password :=  ; è¦æ±‚è¾“å…¥å¯†ç 
+
+ShowSplashText("", "please wait")
 
 if !FileExist(dudesPath)
     FileCreateDir, %dudesPath%
@@ -31,23 +36,23 @@ global logoutHeadUrl := urls["o1"]
 global logoutTailUrl := urls["o2"]
 
 ; class Person {
-; static defaultAge := 18  ; ¾²Ì¬ÊôĞÔ
+; static defaultAge := 18  ; é™æ€å±æ€§
 
-; name := ""  ; ÊµÀıÊôĞÔ
+; name := ""  ; å®ä¾‹å±æ€§
 ; age := 0
 
 ; __New(name, age := "") {
-; ¹¹Ôìº¯Êı
+; æ„é€ å‡½æ•°
 ; this.name := name
 ; if (age != "") {
 ; this.age := age
 ;     } else {
-;         this.age := Person.defaultAge  ; ·ÃÎÊ¾²Ì¬ÊôĞÔ
+;         this.age := Person.defaultAge  ; è®¿é—®é™æ€å±æ€§
 ;     }
 ; }
 
 ; sayHello() {
-;     ; ÊµÀı·½·¨
+;     ; å®ä¾‹æ–¹æ³•
 ;     MsgBox % "Hello, my name is " this.name " and I'm " this.age " years old."
 ; }
 ; }
@@ -55,7 +60,7 @@ global logoutTailUrl := urls["o2"]
 ; p1 := new Person("John", 25)
 ; p2 := new Person("Jane")
 
-; µ÷ÓÃ·½·¨
+; è°ƒç”¨æ–¹æ³•
 ; p1.sayHello()
 ; p2.sayHello()
 
@@ -64,19 +69,28 @@ if(ObjCount(privacies) != 1)
     BuildHotstrings_Send(privacies)
     BuildHotStrings_Run(paths)
     BuildHotStrings_Run(urls)
+}
+CloseWin()
 
-    Try
+Menu_Put(".ahk", "æŸ¥è¯¢", "shell", "scan")
+; Menu_Put(".ahk", "æŸ¥è¯¢", "shell", A_AhkPath . " " . A_ScriptDir . "\test.ahk"" ""show"" ""%1""")
+
+GDUT_KeepAlive()
+Return
+
+; åœ¨è¿æ¥äº†æ ¡å›­ç½‘å¹¶ä¸”ç½‘ç»œä¸å¯ç”¨çš„æ—¶å€™è‡ªåŠ¨ç™»å½•
+GDUT_KeepAlive()
+{
+    While(True)
     {
-        Backup()
-    }
-    Catch
-    {
-        Sleep 20000
-        Backup()
+        If (!Ping("bing.com"))
+        {
+            If (Wifi_Current() = "gdut")
+                GDUT_TryLogin(False)
+        }
+        Sleep, 5000
     }
 }
-
-Return
 
 :*:rd\::
     t := ReadFunctionsInFile()
@@ -85,22 +99,20 @@ Return
 Return
 
 :*:read\::
-    t := ReadFunctionsInFolder()
-    If (t)
-        Clipboard := t
+    ReadFunctionsInFolder()
 Return
 
-; ¿ìËÙÊä³ö ip
+; å¿«é€Ÿè¾“å‡º ip
 :*:ip\::
     SendInput % GetIPAddress()
 Return
 
-; ¿ìËÙÆô¶¯ÍøÒ×ÔÆ localhost
+; å¿«é€Ÿå¯åŠ¨ç½‘æ˜“äº‘ localhost
 :*:wyy\::
     Run %ComSpec% /c npx NeteaseCloudMusicApi, , Minimize
 Return
 
-; ½Å±¾Ä¿Â¼
+; è„šæœ¬ç›®å½•
 :*:app\::
     Run % A_ScriptDir
 Return
@@ -109,7 +121,7 @@ Return
     Reload
 Return
 
-; ÊÖ¶¯±¸·İ
+; æ‰‹åŠ¨å¤‡ä»½
 :*:bu\::
     BackUp()
 Return
@@ -129,19 +141,19 @@ Return
 :*:ex\::
 ExitApp
 
-; ±¾»ú¸ß¼¶ÏµÍ³ÊôĞÔ
+; æœ¬æœºé«˜çº§ç³»ç»Ÿå±æ€§
 :*:se\::
     Run sysdm.cpl
 Return
 
-; ÖØÆô×ÊÔ´¹ÜÀíÆ÷
+; é‡å¯èµ„æºç®¡ç†å™¨
 :*:rf\::
     RunWait %ComSpec% /c taskkill /f /im explorer.exe & start explorer.exe, , Hide
 Return
 
-; Í¨¹ı powershell ½Å±¾Æô¶¯ÈÈµã
+; é€šè¿‡ powershell è„šæœ¬å¯åŠ¨çƒ­ç‚¹
 :*:hs\::
-    ; ĞèÒªÉèÖÃÈ¨ÏŞ²ÅÄÜÔËĞĞ½Å±¾, ÔËĞĞ½áÊøºó»¹Ô­È¨ÏŞÉèÖÃ
+    ; éœ€è¦è®¾ç½®æƒé™æ‰èƒ½è¿è¡Œè„šæœ¬, è¿è¡Œç»“æŸåè¿˜åŸæƒé™è®¾ç½®
     ; Set-ExecutionPolicy Unrestricted
     ; Set-ExecutionPolicy Restricted
     RunCmd_GetFullResult("powershell.exe -Command Set-ExecutionPolicy Unrestricted")
@@ -149,30 +161,30 @@ Return
     RunCmd_GetFullResult("powershell.exe -Command Set-ExecutionPolicy Restricted")
 Return
 
-; Ê¹±¾»úË¯Ãß
+; ä½¿æœ¬æœºç¡çœ 
 :*:sl\::
     DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
 Return
 
-; ¶Ï wifi
+; æ–­ wifi
 :*:dc\::
     Wifi_Disconnect()
 Return
 
-; Á¬Ğ£Ô°Íø
+; è¿æ ¡å›­ç½‘
 :*:lk\::
     Gdut()
 Return
 
-; ¿ìËÙÔÚºóÌ¨Æô¶¯ shizuku
+; å¿«é€Ÿåœ¨åå°å¯åŠ¨ shizuku
 :*:szk\::
     RunWait %ComSpec% /c adb devices, , Hide
     RunWait %ComSpec% /c adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh, , Hide
 Return
 
-;----ÒÔÏÂÊÇ¿ì½İ¼ü----
+;----ä»¥ä¸‹æ˜¯å¿«æ·é”®----
 
-^!S:: ; ctrl + shift + s -> bing ËÑË÷Ñ¡ÖĞµÄÎÄ±¾
+^!S:: ; ctrl + shift + s -> bing æœç´¢é€‰ä¸­çš„æ–‡æœ¬
     Action_UseBrowser("Search", urls["sc"]) ; sc -> search
 Return
 
@@ -186,12 +198,12 @@ Return
     Run_OnLocalHost(urls["lh"])
 Return
 
-^!W:: ; ·¢ËÍ alt + F4 É÷ÓÃ
+^!W:: ; å‘é€ alt + F4 æ…ç”¨
     SendInput !{F4}
 Return
 
-; bÕ¾µÄÌø¹ıÌ«ÂıÁËÓÚÊÇĞ´ÁËÕâ¸öµã»÷Ò»´ÎÏàµ±ÓÚµã»÷ 4 ´Î
-; Ö»Òª°´×¡ '/' ÔÙÁ¬µã×óÓÒ¼ü¼´¿É
+; bç«™çš„è·³è¿‡å¤ªæ…¢äº†äºæ˜¯å†™äº†è¿™ä¸ªç‚¹å‡»ä¸€æ¬¡ç›¸å½“äºç‚¹å‡» 4 æ¬¡
+; åªè¦æŒ‰ä½ '/' å†è¿ç‚¹å·¦å³é”®å³å¯
 ~Right & /::
     Loop % 4
     {
@@ -207,7 +219,7 @@ Return
     }
 Return
 
-; ÉèÖÃÒôÁ¿ - Í¬Àí
+; è®¾ç½®éŸ³é‡ - åŒç†
 ~Up & /::
     SoundSet +5
 Return
@@ -215,7 +227,7 @@ Return
     SoundSet -5
 Return
 
-^1:: ; ±à¼­ËùÓĞµÄ ahk ½Å±¾
+^1:: ; ç¼–è¾‘æ‰€æœ‰çš„ ahk è„šæœ¬
     Loop % apps.MaxIndex()
     {
         a := A_ScriptDir "/" apps[A_Index]
@@ -223,15 +235,15 @@ Return
     }
 Return
 
-^`:: ; ±à¼­ Main.ahk
+^`:: ; ç¼–è¾‘ Main.ahk
     Run %vsPAth% %A_ScriptFullPath%
 Return
 
-Alt & x:: ; ÓÒ¼üµã»÷ÊÂ¼ş
+Alt & x:: ; å³é”®ç‚¹å‡»äº‹ä»¶
     SendInput {AppsKey}
 Return
 
-; Ïà»¥Ó³Éä [´úÂë¸ñÊ½»¯] ¿ì½İ¼ü
+; ç›¸äº’æ˜ å°„ [ä»£ç æ ¼å¼åŒ–] å¿«æ·é”®
 #IfWinActive ahk_exe Code.exe
     ^!l::
         Send !+f

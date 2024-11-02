@@ -1,4 +1,4 @@
-#Include Crypt.ahk
+ï»¿#Include Libs\Crypt.ahk
 #Include MainFunctions.ahk
 
 global dudesPath := A_AppData . "\WannaTakeThisDownTown"
@@ -11,11 +11,11 @@ globalValues["\configs.dude"] := configsDefault
 globalValues["\apps.dude"] := appsDefault
 globalValues["\nameless.dude"] := othersDefauecklt
 
-; ´«ÈëÉúÎÄ±¾·µ»Ø¼üÖµ¶Ô
+; ä¼ å…¥ç”Ÿæ–‡æœ¬è¿”å›é”®å€¼å¯¹
 SimpleReader(content)
 {
     values := {}
-    Loop, Parse, content, `n, `r ; ·Ö¸îÎÄ±¾ÎªÑ­»·µÄ·½Ê½
+    Loop, Parse, content, `n, `r ; åˆ†å‰²æ–‡æœ¬ä¸ºå¾ªç¯çš„æ–¹å¼
     {
         if (Trim(A_LoopField) = "")
         {
@@ -34,21 +34,21 @@ SimpleReader(content)
     Return values
 }
 
-; ½ö½ö·µ»ØÄ¬ÈÏµÄ¼üÖµ¶Ô
+; ä»…ä»…è¿”å›é»˜è®¤çš„é”®å€¼å¯¹
 DefaultReader(filePath)
 {
     for key, value in globalValues ; globalValues -> ["/a.dude"] to "assd<[]>asasfafs"
     {
-        if (filePath = dudesPath . key) ; Èç¹ûÓĞÊÂÏÈÉèÖÃµÄÖµÔòÊ¹ÓÃ
+        if (filePath = dudesPath . key) ; å¦‚æœæœ‰äº‹å…ˆè®¾ç½®çš„å€¼åˆ™ä½¿ç”¨
         {
             Return SimpleReader(value)
         }
     }
 
-    Return SimpleReader(othersDefault) ; ÈôÃ»ÓĞÔòÊ¹ÓÃÒ»¸ö¼òµ¥¼üÖµ¶Ô
+    Return SimpleReader(othersDefault) ; è‹¥æ²¡æœ‰åˆ™ä½¿ç”¨ä¸€ä¸ªç®€å•é”®å€¼å¯¹
 }
 
-; Ğ´ÈëÄ¬ÈÏÖµ
+; å†™å…¥é»˜è®¤å€¼
 DefautWriter(filePath, password)
 {
     if(FileExist(filePath))
@@ -67,12 +67,12 @@ DefautWriter(filePath, password)
     RawWriter(filePath, othersDefault, password)
 }
 
-; Í¨¹ıÂ·¾¶ºÍÎÄ±¾¶ÁÈ¡ÎÄ¼ş
+; é€šè¿‡è·¯å¾„å’Œæ–‡æœ¬è¯»å–æ–‡ä»¶
 FullDudeReader(filePath, password)
 {
-    password := FormatPassword(filePath, password) ; »ñÈ¡"ÕæÃÜÂë"
-    readable := Readable(filePath, password) ; ÉúÎÄ±¾
-    if(!FileExist(filePath)) ; Ğ´µÄÒ»Ûç ÕâÀïÊÇ¼ì²éÎÄ¼şÈô²»´æÔÚÔò´´½¨ÒÔ password ÎªÃÜÂëµÄÄ¬ÈÏÎÄ¼ş
+    password := FormatPassword(filePath, password) ; è·å–"çœŸå¯†ç "
+    readable := Readable(filePath, password) ; ç”Ÿæ–‡æœ¬
+    if(!FileExist(filePath)) ; å†™çš„ä¸€å¨ è¿™é‡Œæ˜¯æ£€æŸ¥æ–‡ä»¶è‹¥ä¸å­˜åœ¨åˆ™åˆ›å»ºä»¥ password ä¸ºå¯†ç çš„é»˜è®¤æ–‡ä»¶
     {
         DefautWriter(filePath, password)
         ShowSplashText("Full Reader", """" . filePath . """: write default data", 1500)
@@ -88,7 +88,7 @@ FullDudeReader(filePath, password)
     }
 }
 
-; Ö±½ÓÇå³ıÔ­ÎÄ¼şÄÚÈİ²¢Ğ´Èë content
+; ç›´æ¥æ¸…é™¤åŸæ–‡ä»¶å†…å®¹å¹¶å†™å…¥ content
 RawWriter(filePath, content, password, tell := False){
     password := FormatPassword(filePath, password)
 
@@ -115,8 +115,8 @@ RawWriter(filePath, content, password, tell := False){
     }
 }
 
-; Î´±»Ê¹ÓÃ£¬£¬£¬£¬ÎÒ·şÁË
-; ĞŞ¸ÄÎÄ¼şµÄº¯ÊıÃ»ÓĞÊ¹ÓÃÕâ¸öº¯ÊıËùÒÔ¿ÉÒÔ¸²¸Ç¾ÉÖµ
+; æœªè¢«ä½¿ç”¨ï¼Œï¼Œï¼Œï¼Œæˆ‘æœäº†
+; ä¿®æ”¹æ–‡ä»¶çš„å‡½æ•°æ²¡æœ‰ä½¿ç”¨è¿™ä¸ªå‡½æ•°æ‰€ä»¥å¯ä»¥è¦†ç›–æ—§å€¼
 FullDudeWriter(filePath, values, password)
 {
     password := FormatPassword(filePath, password) ; real password
@@ -255,8 +255,8 @@ PasswordInput()
     Return str
 }
 
-; ÓÖÉèÖÃÁËÒ»´ÎÃÜÂë
-; ÓÃÃÜÂë½âÃÜÎÄ¼ş, ³É¹¦Ê±·µ»ØÉúÎÄ±¾ ¡®asdsa<[]>asdas\n...¡¯
+; åˆè®¾ç½®äº†ä¸€æ¬¡å¯†ç 
+; ç”¨å¯†ç è§£å¯†æ–‡ä»¶, æˆåŠŸæ—¶è¿”å›ç”Ÿæ–‡æœ¬ â€˜asdsa<[]>asdas\n...â€™
 Readable(filePath, password)
 {
     password := FormatPassword(filePath, password)
@@ -264,7 +264,7 @@ Readable(filePath, password)
     Return Decrypt(str, password)
 }
 
-; ¼ì²éÊÇ·ñÎªÄ³Ğ©²»Ê¹ÓÃÃÜÂëµÄÎÄ¼ş, Èç¹ûÊÇÔò°ÑÃÜÂë¸ÄÎªÄ¬ÈÏÃÜÂë
+; æ£€æŸ¥æ˜¯å¦ä¸ºæŸäº›ä¸ä½¿ç”¨å¯†ç çš„æ–‡ä»¶, å¦‚æœæ˜¯åˆ™æŠŠå¯†ç æ”¹ä¸ºé»˜è®¤å¯†ç 
 FormatPassword(filePath, password)
 {
     for key, value in globalValues
@@ -277,7 +277,7 @@ FormatPassword(filePath, password)
     Return password
 }
 
-; ½«¼üÖµ¶Ô¶ÔÏó½âÎöÎªÒ»¸ö×Ö·û´®
+; å°†é”®å€¼å¯¹å¯¹è±¡è§£æä¸ºä¸€ä¸ªå­—ç¬¦ä¸²
 FormatData(values)
 {
     content := ""
@@ -288,13 +288,13 @@ FormatData(values)
     Return content
 }
 
-; ´«ÈëÎÄ¼şÃû·µ»Ø '.../.../.../name.dude'
+; ä¼ å…¥æ–‡ä»¶åè¿”å› '.../.../.../name.dude'
 FormatAddress(name)
 {
     return dudesPath "\" name ".dude"
 }
 
-; ¼ÓÃÜ×Ö·û´®, Ó¦¸Ã²»»á×ßµ½ catch ¿é
+; åŠ å¯†å­—ç¬¦ä¸², åº”è¯¥ä¸ä¼šèµ°åˆ° catch å—
 ; AES-256
 Encrypt(str, password)
 {
@@ -309,7 +309,7 @@ Encrypt(str, password)
     }
 }
 
-; ½âÎö³ö´íÔò·µ»Ø¿Õ×Ö´®
+; è§£æå‡ºé”™åˆ™è¿”å›ç©ºå­—ä¸²
 ; AES-256
 Decrypt(str, password)
 {

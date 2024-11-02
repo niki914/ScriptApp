@@ -1,4 +1,4 @@
-global keywords := ["for", "if", "loop", "else", "else if", "while", "switch", "try", "catch", "when"]
+ï»¿global keywords := ["for", "if", "loop", "else", "else if", "while", "switch", "try", "catch", "when"]
 
 Action_Translate()
 {
@@ -22,8 +22,8 @@ Action_Translate()
     }
 }
 
-; ³¢ÊÔÍ¨¹ı¼ôÌù°åÉú³ÉÒ»¸ö api ²¢·ÃÎÊ
-; µ±Ç°ÊµÏÖÖ±½ÓËÑË÷ºÍ·­Òë
+; å°è¯•é€šè¿‡å‰ªè´´æ¿ç”Ÿæˆä¸€ä¸ª api å¹¶è®¿é—®
+; å½“å‰å®ç°ç›´æ¥æœç´¢å’Œç¿»è¯‘
 Action_UseBrowser(title, url)
 {
     content := GetText_Clipboard()
@@ -46,15 +46,15 @@ BuildHotStrings_Run(values)
     BuildHotstrings(values, "Run_Arr")
 }
 
-; ÎªÒ»¸öÊı×éµÄËùÓĞÖµ´´½¨Îªµ÷ÓÃ funcName ÈÈ×Ö·û´®
+; ä¸ºä¸€ä¸ªæ•°ç»„çš„æ‰€æœ‰å€¼åˆ›å»ºä¸ºè°ƒç”¨ funcName çƒ­å­—ç¬¦ä¸²
 BuildHotstrings(values, funcName)
 {
     for key in values
         BuildHotstring(funcName, values, key)
 }
 
-; ¶¯Ì¬´´½¨ÈÈ×Ö·û´®
-; Ö÷ÒªÎªÁËÅäÖÃÎÄ¼şÖĞµÄ¼üÖµ¶øÉè¼Æ
+; åŠ¨æ€åˆ›å»ºçƒ­å­—ç¬¦ä¸²
+; ä¸»è¦ä¸ºäº†é…ç½®æ–‡ä»¶ä¸­çš„é”®å€¼è€Œè®¾è®¡
 BuildHotstring(funcName, values, key)
 {
     if(key = "default")
@@ -64,13 +64,13 @@ BuildHotstring(funcName, values, key)
     Hotstring(hotstring, Func(funcName).Bind(values, key))
 }
 
-; bing ·­Òë api
+; bing ç¿»è¯‘ api
 BingTranslate(text)
 {
     langfrom := RegExMatch(text, "[\x{4e00}-\x{9fa5}]") ? "zh-CN": "en"
     langto := langfrom = "en" ? "zh-CN" : "en"
 
-    ; ¹¹½¨ÍêÕûµÄ·­Òë api
+    ; æ„å»ºå®Œæ•´çš„ç¿»è¯‘ api
     url := "http://api.microsofttranslator.com/v2/Http.svc/Translate?appId="
         . "74FE953EB48E1487E94F4BF9C425B6290FF2DA48"
         . "&from="
@@ -79,21 +79,91 @@ BingTranslate(text)
         . RegExReplace(langto, "S)-.*$")
         . "&text=" text
 
-    response := Filter(Web_Get(url), "S)^<[^>]+>(.*?)<\/string>$")
+    rawResponse := Web_Get(url)
+    ; <string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">Persistent   </string>
+    response := Filter(rawResponse, "((?<=>).*?(?=</string>))")
 
+    If (!rawResponse)
+        Return "error;("
     If (!response)
         Return "no response;)"
+
     return response
 }
 
-Web_Get(url)
+; æ£€æŸ¥å¹¶åœ¨å½“æ³¨å†Œè¡¨å€¼ä¸ä¸€è‡´(æˆ–æ— )æ—¶å†™å…¥
+Menu_Check(key, value, data) {
+    RegRead, existingValue, % key, % value
+    if (existingValue != data)
+        RegWrite, % RegType ? RegType : "REG_SZ", % key, % value, % data
+}
+
+; å†™å…¥æ³¨å†Œè¡¨èœå•é¡¹
+; æ–‡ä»¶ç±»å‹ - èœå•é¡¹å - æ–‡ä»¶ç±»å‹çš„æ–°é”® - æ–°é”®çš„å‘½ä»¤
+; "Directory\shell\Parse"
+; "my action"
+; "myKey"
+; "cmd /c cd /d "yourPath""
+Menu_Put(type, actionName, key, command)
+{
+    commandKey := type . "\" . key
+    Menu_Check("HKCR", type, actionName)
+    Menu_Check("HKCR", commandKey, command)
+}
+
+; Menu_Receive()
+; {
+;     if A_ScriptHwnd != A_UniqueID ; å¦‚æœä¸æ˜¯é‡æ–°å¯åŠ¨
+;     {
+;         param := A_ScriptHwnd ? A_ScriptHwnd : 1
+;         if param = a
+;             a(A_ScriptHwnd ? A_ScriptHwnd : A_ScriptFullPath)
+;         else if param = b
+;             b(A_ScriptHwnd ? A_ScriptHwnd : A_ScriptFullPath)
+;     }
+; }
+
+; Menu_Put()
+; {
+;     ; ä¸ºæ–‡ä»¶å¤¹æ·»åŠ "è§£æ"å³é”®èœå•é¡¹
+;     folderKey := "Directory\shell\Parse"
+;     folderValue := ""
+;     folderData := "è§£æ"
+;     Menu_Check("HKCR", folderKey, folderData)
+;     folderCommandKey := folderKey "\command"
+;     folderCommandData := "%A_AhkPath% """"""%A_ScriptFullPath%"""" ""a"" ""%V"""
+;     Menu_Check("HKCR", folderCommandKey, folderCommandData)
+
+;     ; ä¸º .ahk å’Œ .kt æ–‡ä»¶æ·»åŠ "è§£ææ–‡ä»¶"å³é”®èœå•é¡¹
+;     fileKey := ".ahk\shell\ParseFile"
+;     fileValue := ""
+;     fileData := "è§£ææ–‡ä»¶"
+;     Menu_Check("HKCR", fileKey, fileData)
+;     fileCommandKey := fileKey "\command"
+;     fileCommandData := "%A_AhkPath% " """"%A_ScriptFullPath%"""" ""b"" ""%1"""
+;     Menu_Check("HKCR", fileCommandKey, fileCommandData)
+
+;     ktKey := ".kt\shell\ParseFile"
+;     ktValue := ""
+;     ktData := "è§£ææ–‡ä»¶"
+;     Menu_Check("HKCR", ktKey, ktData)
+;     ktCommandKey := ktKey "\command"
+;     Menu_Check("HKCR", ktCommandKey, fileCommandData)
+; }
+
+Ping(host)
+{
+    Return RunCmd_IsValueExisted("ping -n 1 -w 1000 " . host, "(0%") ; '(0% ä¸¢å¤±)'
+}
+
+Web_Get(url, timeOut := 1500)
 {
     Try
     {
         result := ""
 
         WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-        WebRequest.Open("GET", url, true, "", "", 1500)
+        WebRequest.Open("GET", url, true, "", "", timeOut)
         WebRequest.Send()
         WebRequest.WaitForResponse()
 
@@ -120,45 +190,45 @@ Msg(content)
     MsgBox, 262144, , %content%
 }
 
-; ½âÎöÍÕ·å×Ö·û´®ÎªÓ¢ÎÄ¾ä¶Î
-; Ğ§¹û: ¡®StrSplit(str, A_Space)¡¯ -> 'Str split ( str , A _ Space )'
-; µ±ÄÚÈİÎªÈ«´óĞ´µÄµ¥´ÊÔò»áÈ«²¿²ğ¿ª
+; è§£æé©¼å³°å­—ç¬¦ä¸²ä¸ºè‹±æ–‡å¥æ®µ
+; æ•ˆæœ: â€˜StrSplit(str, A_Space)â€™ -> 'Str split ( str , A _ Space )'
+; å½“å†…å®¹ä¸ºå…¨å¤§å†™çš„å•è¯åˆ™ä¼šå…¨éƒ¨æ‹†å¼€
 ParseCamel(str)
 {
     result := ""
-    words := StrSplit(str, A_Space) ; Ô¤´¦Àí: °´¿Õ¸ñ²ğ·ÖÎªÊı×é
+    words := StrSplit(str, A_Space) ; é¢„å¤„ç†: æŒ‰ç©ºæ ¼æ‹†åˆ†ä¸ºæ•°ç»„
 
     for index, word in words
-    { ; ±éÀú
+    { ; éå†
         if (index > 1)
-            result .= A_Space ; ´¦ÀíÏÂÒ»¸öÊı×éÔªËØÇ°²åÈë¿Õ¸ñ
+            result .= A_Space ; å¤„ç†ä¸‹ä¸€ä¸ªæ•°ç»„å…ƒç´ å‰æ’å…¥ç©ºæ ¼
 
         position := 1
-        len := StrLen(word) ; ÓÃÓÚÅĞ¶ÏÑ­»·
+        len := StrLen(word) ; ç”¨äºåˆ¤æ–­å¾ªç¯
 
         while (position <= len)
         {
-            ; position ¶ÔÓ¦µÄ×Ö·û
+            ; position å¯¹åº”çš„å­—ç¬¦
             thisChar := SubStr(word, position, 1)
-            ; position + 1 ¶ÔÓ¦µÄ×Ö·û
+            ; position + 1 å¯¹åº”çš„å­—ç¬¦
             nextChar := (position < len) ? SubStr(word, position + 1, 1) : ""
 
             thisCharIsLowercase := RegExMatch(thisChar, "^[a-z]$")
             thisCharIsUppercase := RegExMatch(thisChar, "^[A-Z]$")
             thisCharIsLetter := thisCharIsLowercase || thisCharIsUppercase
 
-            ; ·ÇÊ××Ö·û²¢ÇÒÊÇ´óĞ´Ôò×ª»¯ÎªĞ¡Ğ´
+            ; éé¦–å­—ç¬¦å¹¶ä¸”æ˜¯å¤§å†™åˆ™è½¬åŒ–ä¸ºå°å†™
             if (position > 1 && thisCharIsUppercase)
             {
                 result .= Format("{:L}", thisChar)
             }
             Else
             {
-                ; ·ñÔò²»´¦Àí
+                ; å¦åˆ™ä¸å¤„ç†
                 result .= thisChar
             }
 
-            ; ÏÂÒ»×Ö·û²»ÊÇĞ¡Ğ´»ò¿Õ¸ñ(¿Õ¸ñ²»ĞèÒªÔÙ¼Ó¿Õ¸ñ), »òÕßµ±Ç°×Ö·û²»ÊÇ×ÖÄ¸, Ôò²åÈë¿Õ¸ñ
+            ; ä¸‹ä¸€å­—ç¬¦ä¸æ˜¯å°å†™æˆ–ç©ºæ ¼(ç©ºæ ¼ä¸éœ€è¦å†åŠ ç©ºæ ¼), æˆ–è€…å½“å‰å­—ç¬¦ä¸æ˜¯å­—æ¯, åˆ™æ’å…¥ç©ºæ ¼
             if (!RegExMatch(nextChar, "^[a-z ]$") || !thisCharIsLetter)
                 result .= A_Space
 
@@ -169,33 +239,33 @@ ParseCamel(str)
     return result
 }
 
-; ÔËĞĞÊı×éµÄÒ»¸öÖµ²¢Í¨¹ı splash text ·´À¡
+; è¿è¡Œæ•°ç»„çš„ä¸€ä¸ªå€¼å¹¶é€šè¿‡ splash text åé¦ˆ
 Run_Arr(array, key)
 {
     Run_ShowingSplashText(array[key])
 }
 
-; ÔËĞĞ²¢Í¨¹ı splash text ·´À¡
+; è¿è¡Œå¹¶é€šè¿‡ splash text åé¦ˆ
 Run_ShowingSplashText(path)
 {
     Run % path
-    ShowSplashText("", "¡Ì", 800)
+    ShowSplashText("", "âˆš", 800)
 }
 
-; Ñ¡ÖĞÒ»¶Î url ±ÈÈç '/login/refresh' »ò 'login/refresh'
-; ÒÑ¾­´¦ÀíÁËÊÇ·ñ¿ªÍ·ÊÇ·ñÎª '/'
-; ±ãÓÚÍøÒ×ÔÆ api µÄµ÷ÊÔ
+; é€‰ä¸­ä¸€æ®µ url æ¯”å¦‚ '/login/refresh' æˆ– 'login/refresh'
+; å·²ç»å¤„ç†äº†æ˜¯å¦å¼€å¤´æ˜¯å¦ä¸º '/'
+; ä¾¿äºç½‘æ˜“äº‘ api çš„è°ƒè¯•
 Run_OnLocalHost(url) {
     content := GetText_Clipboard()
     if (ErrorLevel || RegExReplace(content, "\s") == "")
         Return
-    ; ¼ì²éÆğÊ¼×Ö·ûÊÇ·ñÎª '/'
+    ; æ£€æŸ¥èµ·å§‹å­—ç¬¦æ˜¯å¦ä¸º '/'
     if (SubStr(content, 1, 1) != "/")
         content := "/" . content
     Run %url%%content%
 }
 
-; ÔËĞĞ cmd ÃüÁî²¢¼ì²é½á¹ûÊÇ·ñ°üº¬ÆÚÍûµÄÖµ
+; è¿è¡Œ cmd å‘½ä»¤å¹¶æ£€æŸ¥ç»“æœæ˜¯å¦åŒ…å«æœŸæœ›çš„å€¼
 RunCmd_IsValueExisted(order, hope := "")
 {
     cmdInfo := GetText_Clipboard(order)
@@ -206,22 +276,22 @@ RunCmd_IsValueExisted(order, hope := "")
         Return InStr(cmdInfo, hope, False, 1, 1) > 0 ; check if "cmdInfo" is including "hope"
 }
 
-; ÔËĞĞ cmd ÃüÁî²¢·µ»ØÔËĞĞ½á¹û
+; è¿è¡Œ cmd å‘½ä»¤å¹¶è¿”å›è¿è¡Œç»“æœ
 RunCmd_GetFullResult(order)
 {
     Return GetText_Clipboard(order)
 }
 
-; ±éÀúÑ¡¶¨Ä¿Â¼ÏÂµÄËùÓĞÎÄ¼ş, ²¢½«ËùÓĞÎÄ¼şÓÃº¯ÊıÊµÀı funcInstance ÔËĞĞ, È»ºó½«½á¹ûÑ¹Èë result
+; éå†é€‰å®šç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶, å¹¶å°†æ‰€æœ‰æ–‡ä»¶ç”¨å‡½æ•°å®ä¾‹ funcInstance è¿è¡Œ, ç„¶åå°†ç»“æœå‹å…¥ result
 Run_Folder(folderPath := "", funcInstance := "") {
-    FileSelectFolder, folderPath, , 3, Ñ¡ÔñÒ»¸öÎÄ¼ş¼Ğ
+    FileSelectFolder, folderPath, , 3, é€‰æ‹©ä¸€ä¸ªæ–‡ä»¶å¤¹
 
     If (!folderPath || !FileExist(folderPath))
         Return
 
     result := {}
 
-    Loop, %folderPath%\*.*, 0, 1 ; ±éÀúÎÄ¼ş¼Ğ,²»½øÈë×ÓÎÄ¼ş¼Ğ
+    Loop, %folderPath%\*.*, 0, 1 ; éå†æ–‡ä»¶å¤¹,ä¸è¿›å…¥å­æ–‡ä»¶å¤¹
     {
         If (funcInstance) {
             Try {
@@ -230,12 +300,12 @@ Run_Folder(folderPath := "", funcInstance := "") {
                     result[A_LoopFileName] := r
             }
             Catch {
-                Msg(A_LoopFileName . "½âÎöÊ§°Ü")
+                Msg(A_LoopFileName . "è§£æå¤±è´¥")
             }
         }
     }
 
-    Loop, %folderPath%\*.*, 2, 1 ; ±éÀú×ÓÎÄ¼ş¼Ğ
+    Loop, %folderPath%\*.*, 2, 1 ; éå†å­æ–‡ä»¶å¤¹
     {
         If A_LoopFileIsDir {
             subResult := Run_Folder(A_LoopFileFullPath, funcInstance)
@@ -247,7 +317,7 @@ Run_Folder(folderPath := "", funcInstance := "") {
     Return result ; for index, value in result
 }
 
-; ¶ÁÈ¡Ò»¸öÄ¿Â¼ÏÂµÄÎÄ±¾ÎÄ¼ş, ²¢ÌáÈ¡º¯Êı¶¨Òå²¢Ğ´ÈëĞÂµÄ txt ÎÄ¼şÄÚ
+; è¯»å–ä¸€ä¸ªç›®å½•ä¸‹çš„æ–‡æœ¬æ–‡ä»¶, å¹¶æå–å‡½æ•°å®šä¹‰å¹¶å†™å…¥æ–°çš„ txt æ–‡ä»¶å†…
 ReadFunctionsInFolder()
 {
     result := Run_Folder("", Func("ReadFunctionsInFile"))
@@ -273,11 +343,11 @@ ReadFunctionsInFolder()
     Run % savePath
 }
 
-; ²éÕÒÒ»¸öÎÄ¼şÄÚËùÓĞº¯ÊıµÄ¶¨Òå, ÓĞ¿ÉÄÜÊ¶±ğ´íÎó
+; æŸ¥æ‰¾ä¸€ä¸ªæ–‡ä»¶å†…æ‰€æœ‰å‡½æ•°çš„å®šä¹‰, æœ‰å¯èƒ½è¯†åˆ«é”™è¯¯
 ReadFunctionsInFile(filePath := "")
 {
     If (!filePath)
-        FileSelectFile, filePath, 3, , Ñ¡ÔñÎÄ¼ş ; 1 + 2 ÎÄ¼ş¡¢Â·¾¶¶¼±ØĞë´æÔÚ
+        FileSelectFile, filePath, 3, , é€‰æ‹©æ–‡ä»¶ ; 1 + 2 æ–‡ä»¶ã€è·¯å¾„éƒ½å¿…é¡»å­˜åœ¨
 
     if (!FileExist(filePath))
         Return ""
@@ -286,7 +356,7 @@ ReadFunctionsInFile(filePath := "")
     FileRead, fileContent, %filePath%
 
     pattern := ""
-    pos := 1 ;ÆğÊ¼Î»ÖÃ
+    pos := 1 ;èµ·å§‹ä½ç½®
 
     If (fileExt = "ahk")
         pattern := "((?<=[\n|\r])\s*\w*\s*\([^\n\r()]*\)\s*(?={))"
@@ -294,29 +364,29 @@ ReadFunctionsInFile(filePath := "")
         pattern := "((?<=fun)[ |<].+?\s*?\([\s|\S]*?\)\s*?(?=[:={]))"
     Else
         Return ""
-    ; Ê¶±ğº¯Êı¶¨ÒåµÄÕıÔò
-    ; ±ØĞë¼Ó¸öÀ¨ºÅÔÚÍâÃæ²ÅÄÜ±£´æ
-    ; [A-Z] A-Z ÈÎÒâ×Ö·û
-    ; \w µÈĞ§ÓÚ [a-zA-Z0-9_]
-    ; {xxx}* {xxx} ¿ÉÒÔ³öÏÖÈô¸É´Î [0, +)
-    ; [^\n\r()] ²»¿ÉÒÔÊÇ : \n, \r, (, ), ³ı´ËÖ®ÍâµÄ×Ö·û¾ù¿É
-    ; \s ¿Õ°×·û
-    ; (?=xxx) ÕıÏòÔ¤²éÊÇ·ñÓĞ 'xxx'
-    ; (?<=xxx) ·´ÏòÔ¤²é
+    ; è¯†åˆ«å‡½æ•°å®šä¹‰çš„æ­£åˆ™
+    ; å¿…é¡»åŠ ä¸ªæ‹¬å·åœ¨å¤–é¢æ‰èƒ½ä¿å­˜
+    ; [A-Z] A-Z ä»»æ„å­—ç¬¦
+    ; \w ç­‰æ•ˆäº [a-zA-Z0-9_]
+    ; {xxx}* {xxx} å¯ä»¥å‡ºç°è‹¥å¹²æ¬¡ [0, +)
+    ; [^\n\r()] ä¸å¯ä»¥æ˜¯ : \n, \r, (, ), é™¤æ­¤ä¹‹å¤–çš„å­—ç¬¦å‡å¯
+    ; \s ç©ºç™½ç¬¦
+    ; (?=xxx) æ­£å‘é¢„æŸ¥æ˜¯å¦æœ‰ 'xxx'
+    ; (?<=xxx) åå‘é¢„æŸ¥
 
     Loop
     {
         oldPos := pos
-        newPos := RegExMatch(fileContent, Pattern, match, pos)
+        newPos := RegExMatch(fileContent, pattern, match, pos)
 
         pos := newPos + StrLen(match1)
 
         r := Trim(match1, "`n`r ")
-        If (r && !CheckInclude_Arr(keywords, MapFuncName(r))) ; É¸³ı¿Õ×Ö´®ÒÔ¼°¹Ø¼ü×Ö(½« r µÄº¯ÊıÃûÓë keywords ±éÀú±È½Ï)
+        If (r && !CheckInclude_Arr(keywords, MapFuncName(r))) ; ç­›é™¤ç©ºå­—ä¸²ä»¥åŠå…³é”®å­—(å°† r çš„å‡½æ•°åä¸ keywords éå†æ¯”è¾ƒ)
             result .= r . "`n"
 
         If (oldPos = pos)
-            Break ;Î»ÖÃ²»ÔÙ±ä»¯ÔòÖÕÖ¹
+            Break ;ä½ç½®ä¸å†å˜åŒ–åˆ™ç»ˆæ­¢
     }
 
     Return result
@@ -346,50 +416,34 @@ CheckInclude_Arr(array, hope)
     Return False
 }
 
-; ·¢ËÍÊı×éÖĞµÄÒ»¸öÖµ
+; å‘é€æ•°ç»„ä¸­çš„ä¸€ä¸ªå€¼
 Send_Arr(array, key)
 {
     SendInput % array[key]
 }
 
-; Èç¹ûÕÒµ½ÎÄ¼şÔò·µ»ØÂ·¾¶
-SearchFile_EveryThing(name, fileType) {
-    fullname := ""
-    FindStr := "file: " . name . "*" . fileType
-
-    dll := A_PtrSize = 8 ? "Everything64.dll" : "Everything32.dll"
-    dll := RegExReplace(A_AhkPath, "[^\\]+$", dll)
-
-    hModule := DllCall("LoadLibrary", "Str", dll, "Ptr"), dll .= "\"
-    DllCall(dll . "Everything_SetSearch", "Str", FindStr)
-    DllCall(dll . "Everything_SetRequestFlags", "int" , (EVERYTHING_REQUEST_FILE_NAME := 0x00000001) | (EVERYTHING_REQUEST_PATH := 0x00000002))
-    DllCall(dll . "Everything_Query", "int", 1)
-
-    VarSetCapacity(fullname, 255, 0)
-    DllCall(dll . "Everything_GetResultFullPathName", "int", 0, "Str", fullname, "int", 255)
-    DllCall("FreeLibrary", "Ptr", hModule)
-
-    return fullname
-}
-
 ShowSplashText(title, message, timeout := 0)
 {
     CloseWin()
-    ; FM title's size
-    ; WM title's style
 
-    SplashTextOn, 600, 300
-    Sleep, 50
-    Progress, b CBFFFFFF FM12 WM500 FS15 WS200, `n`n%message%`n`n, %title%, ,
-    if (timeout > 0)
-    {
+    splashWidth := 700
+
+    ; Msg(StrLen(message))
+
+    splashHeight := 300
+
+    SplashTextOn, splashWidth, splashHeight
+
+    splashWidth *= 0.75
+    Sleep, 60
+    Progress, B ZH0 FM12 WM500 FS15 WS200 W%splashWidth%, `n%message%`n, %title%
+    if (timeout)
         SetTimer, CloseAction, -%timeout%
-    }
-    return False
+    Return
 
     CloseAction:
     CloseWin()
-    return True
+    Return ; å¿…è¦çš„
 }
 
 Wifi_IsNear(ssid)
@@ -405,28 +459,28 @@ Wifi_IsConnected(ssid)
 Wifi_Current()
 {
     result := RunCmd_GetFullResult("netsh wlan show interfaces")
-    Return Filter(result, "SSID\s+:\s(.+)") ; "" -> Î´Á¬½Ó
+    Return Filter(result, "SSID\s+:\s(.+)") ; "" -> æœªè¿æ¥
 }
 
-; Õ¹Ê¾½á¹û
-Wifi_Connect(ssid)
+Wifi_Connect(ssid, notify := False)
 {
     msg := RunCmd_GetFullResult("netsh wlan connect name=" . ssid)
-    result := InStr(msg, "ÒÑ", False, 1, 1) > 0
-    If (msg)
+    result := InStr(msg, "å·²", False, 1, 1) > 0
+    If (msg && notify)
         ShowSplashText("", msg, 800)
 
     Return result
 }
 
-; Õ¹Ê¾½á¹û
-Wifi_Disconnect()
+; å±•ç¤ºç»“æœ
+Wifi_Disconnect(notify := False)
 {
     msg := RunCmd_GetFullResult("netsh wlan disconnect")
-    ShowSplashText("", msg, 800)
+    If (notify)
+        ShowSplashText("", msg, 800)
 }
 
-; »ñÈ¡ ipv4 µØÖ·
+; è·å– ipv4 åœ°å€
 GetIPAddress()
 {
     str := ""
@@ -438,8 +492,8 @@ GetIPAddress()
     }
 }
 
-; ¶ÁÈ¡¼ôÌù°å
-; »òÕßÔËĞĞ cmd ÃüÁî²¢Í¨¹ı¼ôÌù°å»ñÈ¡½á¹û
+; è¯»å–å‰ªè´´æ¿
+; æˆ–è€…è¿è¡Œ cmd å‘½ä»¤å¹¶é€šè¿‡å‰ªè´´æ¿è·å–ç»“æœ
 GetText_Clipboard(order := "")
 {
     result := ""
