@@ -1,8 +1,10 @@
 ﻿#Include MainFunctions.ahk
 
 global GDUT_SSID := "gdut"
-global RETRY_COUNT := 5
-
+    , RETRY_COUNT := 5
+    , loginHeadUrl := ""
+    , loginTailUrl := ""
+    
 GDUT(notify := True)
 {
     If(GDUT_TryConnect(notify))
@@ -66,3 +68,4 @@ GDUT_ParseMsg(json)
     RegExMatch(json, "i)""msg""\s*:\s*""(.+?)""", data)
     return data1
 }
+

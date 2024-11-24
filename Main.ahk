@@ -1,96 +1,76 @@
-﻿#Include DudeDealer.ahk
-#Include NetworkActions.ahk
+﻿#Include NetworkActions.ahk
 #Include MainFunctions.ahk
 #Include AutoBackup.ahk
 #Include DllUtils.ahk
+#Include ConfigTools.ahk
 
 #Include Libs\Crypt.ahk
+; #Include Lao\Chrome\Chrome.ahk
 
 #NoTrayIcon ; 不显示小图标
-
 #SingleInstance force ; 单例模式
 
-global dudesPath := A_AppData . "\WannaTakeThisDownTown" ; 配置文件的路径
-global password := PasswordInput() ; 要求输入密码
-; global password :=  ; 要求输入密码
+; 加快脚本运行速度的设置
+#NoEnv
+#MaxHotkeysPerInterval 99000000
+#HotkeyInterval 99000000
+#KeyHistory 0
+ListLines Off
+Process, Priority, , A
+SetBatchLines, -1
+SetKeyDelay, -1, -1
+SetMouseDelay, -1
+SetDefaultMouseSpeed, 0
+SetWinDelay, -1
+SetControlDelay, -1
+SendMode Input
+DllCall("ntdll\ZwSetTimerResolution", "Int", 5000, "Int", 1, "Int*", MyCurrentTimerResolution) ; setting the Windows Timer Resolution to 0.5ms, THIS IS A GLOBAL CHANGE
+; 加快脚本运行速度的设置
+
+;TODO 封装 file 读写、网络请求、json加密存取、消息封装：tooltip、splash、msgbox
+
+global configsDefaultJson := "[""configs"",""paths"",""urls""]"
+    , fileContents := {}
+    , manifest := []
+    , password := ""
+
+If (A_Args[1])
+{
+    password := A_Args[1]
+    ConfigsReload(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
+}
+Else
+{
+    ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
+}
 
 ShowSplashText("", "please wait")
 
-if !FileExist(dudesPath)
-    FileCreateDir, %dudesPath%
-
-Sleep 300
-
-global configs := FullDudeReader(dudesPath . "\configs.dude","")
-global apps := FullDudeReader(dudesPath . "\apps.dude","")
-global privacies := FullDudeReader(dudesPath . "\privacies.dude", password)
-global paths := FullDudeReader(dudesPath . "\paths.dude", password)
-global urls := FullDudeReader(dudesPath . "\urls.dude", password)
-global nameless := FullDudeReader(dudesPath . "\nameless.dude", "")
-
-global vsPAth := paths["vs"]
-
-global loginHeadUrl := urls["i1"] . privacies["no"] . urls["i2"] . privacies["sdcd"] . urls["i3"]
-global loginTailUrl := urls["i4"]
-global logoutHeadUrl := urls["o1"]
-global logoutTailUrl := urls["o2"]
-
-; class Person {
-; static defaultAge := 18  ; 静态属性
-
-; name := ""  ; 实例属性
-; age := 0
-
-; __New(name, age := "") {
-; 构造函数
-; this.name := name
-; if (age != "") {
-; this.age := age
-;     } else {
-;         this.age := Person.defaultAge  ; 访问静态属性
-;     }
-; }
-
-; sayHello() {
-;     ; 实例方法
-;     MsgBox % "Hello, my name is " this.name " and I'm " this.age " years old."
-; }
-; }
-
-; p1 := new Person("John", 25)
-; p2 := new Person("Jane")
-
-; 调用方法
-; p1.sayHello()
-; p2.sayHello()
-
-if(ObjCount(privacies) != 1)
+For index, value in manifest
 {
-    BuildHotstrings_Send(privacies)
-    BuildHotStrings_Run(paths)
-    BuildHotStrings_Run(urls)
+    obj := JSON.Load(fileContents[value])
+    PraseObject(obj)
 }
+
+BuildHotStrings()
+BuildRunnables()
+BuildCodes()
+
+global vsPAth := POOL_RUNNABLE["vs"]
+
+loginHeadUrl := POOL_STATIC["i1"] . POOL_HOTSTRING["no"] . POOL_STATIC["i2"] . POOL_HOTSTRING["sdcd"] . POOL_STATIC["i3"]
+loginTailUrl := POOL_STATIC["i4"]
+
 CloseWin()
 
-Menu_Put(".ahk", "查询", "shell", "scan")
-; Menu_Put(".ahk", "查询", "shell", A_AhkPath . " " . A_ScriptDir . "\test.ahk"" ""show"" ""%1""")
+; Chrome_Run("https://localhost:47990/")
 
 GDUT_KeepAlive()
 Return
 
-; 在连接了校园网并且网络不可用的时候自动登录
-GDUT_KeepAlive()
-{
-    While(True)
-    {
-        If (!Ping("bing.com"))
-        {
-            If (Wifi_Current() = "gdut")
-                GDUT_TryLogin(False)
-        }
-        Sleep, 5000
-    }
-}
+; :*:ct\::
+;     Action_LoaclTunnel()
+; Return
 
 :*:rd\::
     t := ReadFunctionsInFile()
@@ -107,48 +87,8 @@ Return
     SendInput % GetIPAddress()
 Return
 
-; 快速启动网易云 localhost
-:*:wyy\::
-    Run %ComSpec% /c npx NeteaseCloudMusicApi, , Minimize
-Return
-
-; 脚本目录
-:*:app\::
-    Run % A_ScriptDir
-Return
-
 :*:``12::
-    Reload
-Return
-
-; 手动备份
-:*:bu\::
-    BackUp()
-Return
-
-:*:ed\::
-    UpdateData(configs, password)
-Return
-
-:*:dd\::
-    Run % dudesPath
-Return
-
-:*:cg\::
-    password := ChangePassword(password)
-Return
-
-:*:ex\::
-ExitApp
-
-; 本机高级系统属性
-:*:se\::
-    Run sysdm.cpl
-Return
-
-; 重启资源管理器
-:*:rf\::
-    RunWait %ComSpec% /c taskkill /f /im explorer.exe & start explorer.exe, , Hide
+    Run, %A_AhkPath% Main.ahk %password%
 Return
 
 ; 通过 powershell 脚本启动热点
@@ -161,11 +101,6 @@ Return
     RunCmd_GetFullResult("powershell.exe -Command Set-ExecutionPolicy Restricted")
 Return
 
-; 使本机睡眠
-:*:sl\::
-    DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
-Return
-
 ; 断 wifi
 :*:dc\::
     Wifi_Disconnect()
@@ -174,12 +109,6 @@ Return
 ; 连校园网
 :*:lk\::
     Gdut()
-Return
-
-; 快速在后台启动 shizuku
-:*:szk\::
-    RunWait %ComSpec% /c adb devices, , Hide
-    RunWait %ComSpec% /c adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh, , Hide
 Return
 
 ;----以下是快捷键----
@@ -227,14 +156,6 @@ Return
     SoundSet -5
 Return
 
-^1:: ; 编辑所有的 ahk 脚本
-    Loop % apps.MaxIndex()
-    {
-        a := A_ScriptDir "/" apps[A_Index]
-        Run %vsPAth% %a%
-    }
-Return
-
 ^`:: ; 编辑 Main.ahk
     Run %vsPAth% %A_ScriptFullPath%
 Return
@@ -254,4 +175,63 @@ Return
     !+f::
         Send ^!l
     return
+    :*:bd\::
+        SendInput, Build APK(s)
+    Return
 #IfWinActive
+
+; 在连接了校园网并且网络不可用的时候自动登录
+GDUT_KeepAlive()
+{
+    lastPingTime := A_TickCount
+    pingCD := 5 * 1000
+    While(True)
+    {
+        If(A_TickCount - lastPingTime > pingCD)
+        {
+            If (Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 2) == -1 && Wifi_Current() = "gdut")
+                GDUT_TryLogin()
+            lastPingTime := A_TickCount ; 更新时间戳
+        }
+
+        Sleep, 300
+    }
+}
+
+; ; 以下为弃用热字符串(已集成至 json 配置文件内)
+
+; :*:wlan\::
+;     Run % ComSpec " /c ncpa.cpl", , Hide
+; Return
+
+; ; 快速启动网易云 localhost
+; :*:wyy\::
+;     Run %ComSpec% /c npx NeteaseCloudMusicApi, , Minimize
+; Return
+
+; ; 脚本目录
+; :*:app\::
+;     Run % A_ScriptDir
+; Return
+
+; :*:ed\::
+;     Run, ConfigEditor.ahk
+; Return
+
+; :*:ex\::
+; ExitApp
+
+; 本机高级系统属性
+; :*:se\::
+;     Run sysdm.cpl
+; Return
+
+; ; 重启资源管理器
+; :*:rf\::
+;     RunWait %ComSpec% /c taskkill /f /im explorer.exe & start explorer.exe, , Hide
+; Return
+
+; ; 使本机睡眠
+; :*:sl\::
+;     DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
+; Return

@@ -1,4 +1,88 @@
 ﻿global keywords := ["for", "if", "loop", "else", "else if", "while", "switch", "try", "catch", "when"]
+; global localhostPath := A_ScriptDir . "\base_url.txt"
+global WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+
+; Chrome_Run(url)
+; {
+;     ChromeInst := new Chrome("C:\Users\" . A_UserName . "\AppData\Local\Microsoft\Edge\User Data", url)
+;     Return ChromeInst
+; }
+
+; Action_LoaclTunnel(port := "3000")
+; {
+;     result := GetUrl_NewLoaclTunnel()
+
+;     If (!result)
+;         Return
+
+;     oldUrl := GetUrl_OnLocalFile()
+
+;     If (result != oldUrl)
+;         FileOpen(localhostPath, "w").Write(result).Close()
+
+;     Clipboard := result
+;     ShowSplashText("localhost", "successfully run`n" . result, 1000)
+; }
+
+; GetUrl_OnLocalFile()
+; {
+;     FileRead, url, %localhostPath%
+;     Return url
+; }
+
+; GetUrl_NewLoaclTunnel(port := "3000")
+; {
+;     ; Run % ComSpec " /c lt --port 3000", , Maximize
+;     Run % ComSpec " /c ssh -R 80:localhost:" . port . " localhost.run`nyes`n", , Maximize
+;     ; Run % ComSpec " /c ssh -R 80:localhost:3000 NIKI@localhost.run`nyes`n", , Maximize
+
+;     Sleep, 1000
+
+;     SetTitleMatchMode, 2
+;     IfWinExist, cmd.exe
+;     {
+;         BlockInput, On
+;         WinMaximize
+;     }
+;     Else
+;         Return ""
+
+;     Sleep, 500
+;     WinGetPos, X, Y, Width, Height, A
+
+;     StartX := (X + Width) * 0.8
+;     StartY := (Y + Height) * 0.8
+;     EndX := X
+;     EndY := Y
+
+;     While !result
+;     {
+;         Click, %StartX%, %StartY%, Down ; 按下鼠标左键
+;         SetDefaultMouseSpeed, 3
+;         Click, %EndX%, %EndY%, Up ; 释放鼠标左键
+
+;         Sleep, 200
+;         result := ""
+;         previous := ClipboardAll ; backup
+
+;         Clipboard := ""
+;         SendInput, ^c
+;         ClipWait, 0.5
+
+;         result := Clipboard
+;         result := Trim(result, "`n`r ")
+;         result := Filter(result, "(http.+?.life)")
+;         Clipboard := previous ; restitute
+;     }
+
+;     ; SetDefaultMouseSpeed, 0
+;     ; Click, %Width%, %Y%
+
+;     WinMinimize
+;     BlockInput, Off
+
+;     Return result
+; }
 
 Action_Translate()
 {
@@ -6,20 +90,16 @@ Action_Translate()
     str := ParseCamel(rawText)
 
     if (ErrorLevel || RegExReplace(str, "\s") == "")
-    {
         Return
-    }
-    else
-    {
-        str := BingTranslate(str)
-        ShowSplashText("press C to copy", str)
 
-        Input, key, L1, {Tab}{BackSpace}{LControl}{RControl}{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{AppsKey}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}{BS}{Capslock}{Numlock}{PrintScreen}{Pause}
-        if (key = "c")
-            Clipboard := str
+    str := BingTranslate(str)
+    ShowSplashText("press C to copy", str)
 
-        CloseWin()
-    }
+    Input, key, L1, {Tab}{BackSpace}{LControl}{RControl}{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{AppsKey}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}{BS}{Capslock}{Numlock}{PrintScreen}{Pause}
+    if (key = "c")
+        Clipboard := str
+
+    CloseWin()
 }
 
 ; 尝试通过剪贴板生成一个 api 并访问
@@ -34,34 +114,6 @@ Action_UseBrowser(title, url)
             Return
     }
     Run %url%%content% ; 'https://xxx.com?q=' + 'content'
-}
-
-BuildHotstrings_Send(values)
-{
-    BuildHotstrings(values, "Send_Arr")
-}
-
-BuildHotStrings_Run(values)
-{
-    BuildHotstrings(values, "Run_Arr")
-}
-
-; 为一个数组的所有值创建为调用 funcName 热字符串
-BuildHotstrings(values, funcName)
-{
-    for key in values
-        BuildHotstring(funcName, values, key)
-}
-
-; 动态创建热字符串
-; 主要为了配置文件中的键值而设计
-BuildHotstring(funcName, values, key)
-{
-    if(key = "default")
-        Return
-
-    hotstring := ":*:" key "\"
-    Hotstring(hotstring, Func(funcName).Bind(values, key))
 }
 
 ; bing 翻译 api
@@ -151,9 +203,27 @@ Menu_Put(type, actionName, key, command)
 ;     Menu_Check("HKCR", ktCommandKey, fileCommandData)
 ; }
 
-Ping(host)
+Ping(url, timeout := 1)
 {
-    Return RunCmd_IsValueExisted("ping -n 1 -w 1000 " . host, "(0%") ; '(0% 丢失)'
+    result := -1
+    Try
+    {
+        ; WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        WebRequest.Open("GET", url, true, "", "", 1000)
+        WebRequest.Send()
+        WebRequest.WaitForResponse(timeout)
+
+        result := WebRequest.Status
+
+        WebRequest.Close()
+        ; ObjRelease(WebRequest)
+
+        Return result
+    }
+    Catch
+    {
+        Return result
+    }
 }
 
 Web_Get(url, timeOut := 1500)
@@ -184,7 +254,6 @@ CloseWin()
     SplashTextOff
 }
 
-; fast msgbox
 Msg(content)
 {
     MsgBox, 262144, , %content%
@@ -239,17 +308,29 @@ ParseCamel(str)
     return result
 }
 
-; 运行数组的一个值并通过 splash text 反馈
-Run_Arr(array, key)
+; 映射 sendInput
+SendString(str)
 {
-    Run_ShowingSplashText(array[key])
+    SendInput % str
 }
 
 ; 运行并通过 splash text 反馈
-Run_ShowingSplashText(path)
+RunWithSplashText(path)
 {
     Run % path
     ShowSplashText("", "√", 800)
+}
+
+RunWaitString(command)
+{
+    head := "#NoTrayIcon`n#SingleInstance force`n#NoEnv`n#MaxHotkeysPerInterval 99000000`n#HotkeyInterval 99000000`n#KeyHistory 0`nListLines Off`nProcess, Priority, , A`nSetBatchLines, -1`nSetKeyDelay, -1, -1`nSetMouseDelay, -1`nSetDefaultMouseSpeed, 0`nSetWinDelay, -1`nSetControlDelay, -1`nSendMode Input`n"
+    tail := "`nExitApp"
+    order := head . command . tail
+    tempFile := A_ScriptDir . "\~tmp_" . A_TickCount . ".ahk"
+    FileDelete %tempFile% ; 删除旧的临时文件(如果存在)
+    FileAppend, %order%, %tempFile% ; 将代码写入临时文件
+    RunWait %A_AhkPath% /r "%tempFile%"
+    FileDelete %tempFile%
 }
 
 ; 选中一段 url 比如 '/login/refresh' 或 'login/refresh'
@@ -343,6 +424,12 @@ ReadFunctionsInFolder()
     Run % savePath
 }
 
+StrReverse(str) {
+    static rev := A_IsUnicode ? "_wcsrev" : "_strrev"
+    DllCall("msvcrt.dll\" rev, "Ptr", &str, "CDECL")
+    return str
+}
+
 ; 查找一个文件内所有函数的定义, 有可能识别错误
 ReadFunctionsInFile(filePath := "")
 {
@@ -414,12 +501,6 @@ CheckInclude_Arr(array, hope)
             Return true
     }
     Return False
-}
-
-; 发送数组中的一个值
-Send_Arr(array, key)
-{
-    SendInput % array[key]
 }
 
 ShowSplashText(title, message, timeout := 0)
@@ -504,7 +585,6 @@ GetText_Clipboard(order := "")
     If (order) ; using CMD
     {
         RunWait % ComSpec " /c " . order . " | CLIP", , Hide
-        ClipWait 2
     }
     Else ; directly copy
     {
