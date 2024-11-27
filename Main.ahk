@@ -50,7 +50,7 @@ global vsPAth := POOL_RUNNABLE.vs
     , studentNumber := POOL_HOTSTRING["no"]
     , studentPassword := POOL_HOTSTRING["pw"]
 
-loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . studentNumber . POOL_STATIC["login3"]
+loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . studentPassword . POOL_STATIC["login3"]
 loginTailUrl := POOL_STATIC["login4"]
 
 ST_Dismiss()
@@ -73,7 +73,9 @@ Return
 Return
 
 :*:read\::
-    ReadFileDescriptionForFolder()
+    t := ReadFileDescriptionForFolder()
+    If (t)
+        Clipboard := t
 Return
 
 ; 快速输出 ip
@@ -348,31 +350,6 @@ RunFuncForDirectory(path, funcInstance, ByRef result)
             }
         }
     }
-}
-
-; 读取一个目录下的文本文件, 并提取函数定义并写入新的 txt 文件内
-ReadFileDescriptionForFolder()
-{
-    result := RunFolder("GetFuncDescriptionInFile")
-    If (!result.Count())
-        Return
-
-    FileSelectFile, savePath, S, file.txt, Save file, Text Documents (*.txt)
-    If (!savePath)
-        Return
-
-    content := ""
-    for index, value in result
-        content .= "[" . index . "]`n" . value . "`n`n"
-
-    If (!content)
-        Return
-
-    f := FileOpen(savePath, "w")
-    f.Write(content)
-    f.Close()
-
-    Run % savePath
 }
 
 ; ; 以下为弃用热字符串(已集成至 json 配置文件内)

@@ -51,6 +51,33 @@ GetFuncDescriptionInFile(filePath := "")
   Return result
 }
 
+; 读取一个目录下的文本文件, 并提取函数定义并写入新的 txt 文件内
+ReadFileDescriptionForFolder()
+{
+  result := RunFolder("GetFuncDescriptionInFile")
+  If (!result.Count())
+    Return
+
+  FileSelectFile, savePath, S, file.txt, Save file, Text Documents (*.txt)
+  If (!savePath)
+    Return
+
+  content := ""
+  for index, value in result
+    content .= "[" . index . "]`n" . value . "`n`n"
+
+  Return content
+
+  ; If (!content)
+  ;     Return
+
+  ; f := FileOpen(savePath, "w")
+  ; f.Write(content)
+  ; f.Close()
+
+  ; Run % savePath
+}
+
 ; 提取函数名
 FilterFuncName(str)
 {
