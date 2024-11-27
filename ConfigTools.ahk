@@ -1,27 +1,33 @@
-﻿#Include Filer.ahk
+﻿; IsParsable(v)
+; IsUrl(str)
+; PraseObject(obj, parent := "")
+; BuildRunnables()
+; BuildHotStrings()
+; BuildCodes()
+; BuildHotstring(funcName, key, value)
+; ConfigsReload(cPath, cDefault, password, ByRef contents, ByRef manifest)
+; ConfigsInit(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
+; Guidance()
+; RequirePassword(msg)
+; ReadCryptedJsonString(path, password, default)
+; ReadCyptedJSON(path, password, default)
+; IsJson(str)
+; WriteCryptedJsonString(path, str, password)
+; WriteCryptedJSON(path, obj, password)
+; ReadCryptedFile(path, password, default)
+; WriteCryptFile(path, bytes, password)
+; AppendCryptFile(path, bytes, password)
+; GetConfigPath(name)
+; ReadConfigFiles(manifest, password, ByRef outObj, default)
+
+#Include FileTools.ahk
+#Include Message.ahk
 #Include Libs\JSON.ahk
-#Include MainFunctions.ahk
 
 global POOL_RUNNABLE := {}
     , POOL_CODE := {}
     , POOL_STATIC := {}
     , POOL_HOTSTRING := {}
-
-GetType(v) {
-    If (IsObject(v))
-    {
-        If (v.Length())
-            Return "array"
-        If (v.Count())
-            Return "object"
-        Return "clazz"
-    }
-    If v is Number
-        Return "number"
-    If (v != "")
-        Return "string"
-    Return "undifined"
-}
 
 IsParsable(v)
 {
@@ -40,20 +46,30 @@ PraseObject(obj, parent := "")
         Return
 
     str := obj["value"]
+    strType := GetType(str)
+    type := obj["type"]
 
-    If (GetType(str) == "string") ; 当设置了 value 属性时
+    If (strType == "string" || strType == "number") ; 当设置了 value 属性时
     {
-        type := obj["type"]
-
         If (type == "hotString")
             POOL_HOTSTRING[parent] := str
         Else If (type == "runnable")
             POOL_RUNNABLE[parent] := str
         Else If (type == "code")
             POOL_CODE[parent] := str
-        Else ; 全部当作 static 处理
+        Else If (type == "static")
             POOL_STATIC[parent] := str
+        Else ; 全部当作 static 处理
+        {
+            MB(parent . " 设置了未定义的 type: " . type)
+            POOL_STATIC[parent] := str
+        }
 
+        Return
+    }
+    Else If (strType == "undifined" && type)
+    {
+        MB("未设置 value 的项: " . parent)
         Return
     }
 
@@ -178,10 +194,10 @@ ConfigsInit(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
 ; code
 Guidance()
 {
-    Msg("输入 ""ed\"" 可以打开编辑器，可以用 json 编辑工具编辑完成后再粘贴")
-    Msg("使用高级功能的话需要设置两个变量:`n""type"": $str`n""value"": $str")
-    Msg("type:`n hotString => 可展开的热字符串`n static => 内部的静态变量`n runnable =>可运行路径, 完整的文件路径和url均可 `n code => ahk代码`n`n必须为其中之一，否则视作static")
-    Msg("示例: `n{`n""vs"":{""type"":""runnable"",""value"": ""D:\vscode.exe""}`n}")
+    MB("输入 ""ed\"" 可以打开编辑器，可以用 json 编辑工具编辑完成后再粘贴")
+    MB("使用高级功能的话需要设置两个变量:`n""type"": $str`n""value"": $str")
+    MB("type:`n hotString => 可展开的热字符串`n static => 内部的静态变量`n runnable =>可运行路径, 完整的文件路径和url均可 `n code => ahk代码`n`n必须为其中之一，否则视作static")
+    MB("示例: `n{`n""vs"":{""type"":""runnable"",""value"": ""D:\vscode.exe""}`n}")
 }
 
 ; 要求输入密码
@@ -191,15 +207,6 @@ RequirePassword(msg)
     if ErrorLevel ; 用户按下取消或关闭窗口
         Return -1
     Return str
-}
-
-; 文件大小
-GetFileSize(filePath)
-{
-    FileGetSize, fileSize, %filePath%
-    if (ErrorLevel)
-        return -1 ; 表示错误
-    return fileSize
 }
 
 ; 读取加密文件为 json 字串
@@ -281,10 +288,8 @@ WriteCryptedJSON(path, obj, password)
 ; 读取加密文件为字节数组
 ReadCryptedFile(path, password, default)
 {
-    f := new Filer(path)
-    bytes := f.ReadBytes()
+    bytes := ReadBytes(path, 256)
     decrypt := CryptBytes(bytes, password)
-    f.Close()
     If (!bytes.Length())
     {
         defults := StringToBytes(default, "UTF-8")
@@ -300,69 +305,17 @@ ReadCryptedFile(path, password, default)
 ; 写入加密的字节数组到文件
 WriteCryptFile(path, bytes, password)
 {
-    f := new Filer(path)
     encrypt := CryptBytes(bytes, password)
-    count := f.WriteBytes(encrypt)
-    f.Close()
+    count := WriteBytes(path, encrypt, 256)
     Return count
 }
 
 ; 写入加密的字节数组到文件
 AppendCryptFile(path, bytes, password)
 {
-    f := new Filer(path)
     encrypt := CryptBytes(bytes, password)
-    count := f.AppendBytes(encrypt)
-    f.Close()
+    count := AppendBytes(path, encrypt, 256)
     Return count
-}
-
-; 对字节数组进行异或运算并返回结果
-CryptBytes(bytes, password)
-{
-    pwLength := StrLen(password)
-    length := bytes.Length()
-    encryptedBytes := []
-
-    Loop % length
-    {
-        dataChar := bytes[A_Index]
-        pwChar := NumGet(&password, Mod(A_Index - 1, pwLength), "UChar")
-        encryptedBytes.Push(dataChar ^ pwChar)
-    }
-
-    Return encryptedBytes
-}
-
-; 字节数组转字符串
-BytesToString(bytes, encoding := "UTF-8") {
-    length := bytes.Length()
-    VarSetCapacity(buffer, length, 0) ; 用 0 初始化片区确保使用干净的内存区。。。。。。
-
-    Loop % length
-    {
-        NumPut(bytes[A_Index], buffer, A_Index - 1, "UChar")
-    }
-
-    result := StrGet(&buffer, encoding)
-    actualLength := StrLen(result)
-    Return SubStr(result, 1, actualLength)
-}
-
-; 字符串转字节数组
-StringToBytes(str, encoding := "UTF-8") {
-    length := StrPut(str, encoding) - 1
-    VarSetCapacity(buffer, length, 0)
-
-    StrPut(str, &buffer, length + 1, encoding)
-
-    bytes := []
-    Loop % length
-    {
-        bytes.Push(NumGet(buffer, A_Index - 1, "UChar"))
-    }
-
-    return bytes
 }
 
 ; 生成配置文件路径
@@ -371,7 +324,7 @@ GetConfigPath(name)
     Return A_ScriptDir . "\Config\" . name . ".cy"
 }
 
-; 根据字符串数组读取配置文件并返回读取到的对象
+; 根据字符串数组读取配置文件并在 outObj 返回读取到的对象
 ; 返回值表示密码是否正确
 ReadConfigFiles(manifest, password, ByRef outObj, default)
 {

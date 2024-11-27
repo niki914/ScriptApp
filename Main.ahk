@@ -1,9 +1,5 @@
-﻿#Include NetworkActions.ahk
-#Include MainFunctions.ahk
-#Include AutoBackup.ahk
-#Include ConfigTools.ahk
+﻿#Include ALL.ahk
 
-#Include Libs\Crypt.ahk
 ; #Include Lao\Chrome\Chrome.ahk
 
 #NoTrayIcon ; 不显示小图标
@@ -43,7 +39,7 @@ Else
     ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
 }
 
-ShowSplashText("", "please wait")
+ST_Show("please wait")
 
 For index, value in manifest
 {
@@ -55,14 +51,23 @@ BuildHotStrings()
 BuildRunnables()
 BuildCodes()
 
-global vsPAth := POOL_RUNNABLE["vs"]
+global vsPAth := POOL_RUNNABLE.vs
 
-loginHeadUrl := POOL_STATIC["i1"] . POOL_HOTSTRING["no"] . POOL_STATIC["i2"] . POOL_HOTSTRING["sdcd"] . POOL_STATIC["i3"]
-loginTailUrl := POOL_STATIC["i4"]
+loginHeadUrl := POOL_STATIC["login1"] . POOL_HOTSTRING["no"] . POOL_STATIC["login2"] . POOL_HOTSTRING["pw"] . POOL_STATIC["login3"]
+loginTailUrl := POOL_STATIC["login4"]
 
-CloseWin()
+ST_Dismiss()
 
 ; Chrome_Run("https://localhost:47990/")
+
+; t := A_TickCount
+; r := RunCmd("netsh wlan show networks mode=bssid")
+; t := A_TickCount - t
+
+; MsgBox % DeepLTranslate("你妈", POOL_STATIC.deepl, "ZH", "EN-US")
+; MsgBox % DeepLTranslate("mom", "57e79a31-6bdc-41f0-abb9-dd11011320bb:fx")
+
+; "å¦"
 
 GDUT_KeepAlive()
 Return
@@ -71,19 +76,23 @@ Return
 ;     Action_LoaclTunnel()
 ; Return
 
+:*:ed\::
+    Run, ConfigEditor.ahk
+Return
+
 :*:rd\::
-    t := ReadFunctionsInFile()
+    t := GetFuncDescriptionInFile()
     If (t)
         Clipboard := t
 Return
 
 :*:read\::
-    ReadFunctionsInFolder()
+    ReadFileDescriptionForFolder()
 Return
 
 ; 快速输出 ip
 :*:ip\::
-    SendInput % GetIPAddress()
+    SendInput % GetIP()
 Return
 
 :*:``12::
@@ -95,35 +104,33 @@ Return
     ; 需要设置权限才能运行脚本, 运行结束后还原权限设置
     ; Set-ExecutionPolicy Unrestricted
     ; Set-ExecutionPolicy Restricted
-    RunCmd_GetFullResult("powershell.exe -Command Set-ExecutionPolicy Unrestricted")
-    ShowSplashText("Hotspot", RunCmd_GetFullResult("powershell.exe -Command D:; cd " . A_ScriptDir . "; .\hotspot.ps1"), 1500)
-    RunCmd_GetFullResult("powershell.exe -Command Set-ExecutionPolicy Restricted")
+    RunCmd("powershell.exe -Command Set-ExecutionPolicy Unrestricted")
+    ST_Show(RunCmd("powershell.exe -Command D:; cd " . A_ScriptDir . "; .\hotspot.ps1"), "", 1500)
+    RunCmd("powershell.exe -Command Set-ExecutionPolicy Restricted")
 Return
 
 ; 断 wifi
 :*:dc\::
-    Wifi_Disconnect()
+    DisconnectWifi()
 Return
 
 ; 连校园网
 :*:lk\::
-    Gdut()
+    ST_Show(GDUT(), "gdut", 800)
 Return
 
 ;----以下是快捷键----
 
 ^!S:: ; ctrl + shift + s -> bing 搜索选中的文本
-    Action_UseBrowser("Search", urls["sc"]) ; sc -> search
+    RunUrl("Search", POOL_STATIC.bingSearch) ; sc -> search
 Return
 
 ^!T::
-    Action_UseBrowser("Translate", urls["ts"]) ; ts -> translate
+    RunUrl("Translate", POOL_STATIC.bingTranslate) ; ts -> translate
 Return
+
 #T::
-    Action_Translate()
-Return
-^!Z::
-    Run_OnLocalHost(urls["lh"])
+    Translate(POOL_STATIC.bing, POOL_STATIC.deepl)
 Return
 
 ^!W:: ; 发送 alt + F4 慎用
@@ -133,14 +140,14 @@ Return
 ; b站的跳过太慢了于是写了这个点击一次相当于点击 4 次
 ; 只要按住 '/' 再连点左右键即可
 ~Right & /::
-    Loop % 4
+    Loop 4
     {
         Sleep 10
         SendInput {Right}
     }
 Return
 ~left & /::
-    Loop % 4
+    Loop 4
     {
         Sleep 10
         SendInput {left}
@@ -179,22 +186,200 @@ Return
     Return
 #IfWinActive
 
-; 在连接了校园网并且网络不可用的时候自动登录
-GDUT_KeepAlive()
+; 通过剪贴板获取鼠标选取的文本
+GetSelectedText()
 {
-    lastPingTime := A_TickCount
-    pingCD := 5 * 1000
-    While(True)
-    {
-        If(A_TickCount - lastPingTime > pingCD)
-        {
-            If (Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 2) == -1 && Wifi_Current() = "gdut")
-                GDUT_TryLogin()
-            lastPingTime := A_TickCount ; 更新时间戳
-        }
 
-        Sleep, 300
+    ClipSaved := ClipboardAll ; 把剪贴板的所有内容 (任何格式)
+
+    Clipboard := "" ; 清除
+
+    Send, ^c
+    ClipWait, 0.3
+
+    clip := Clipboard
+    Clipboard := ClipSaved ; 使用 Clipboard (不是 ClipboardAll)
+
+    Return clip
+}
+
+; 等待按下键盘的一个按键并返回它的名字, 不保证全部按键的捕捉
+WaitForKey()
+{
+    ; L1 指识别一个键击
+    Input, key, L1, {Space}{Enter}{Tab}{BackSpace}{LControl}{RControl}{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{AppsKey}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}{BS}{Capslock}{Numlock}{PrintScreen}{Pause}
+
+    ; 上面一堆键名是额外的暂停符号, 会被捕捉至 error level, 最后再用正则解析出来
+    If (!key && ErrorLevel)
+        key := FilterText(ErrorLevel, "((?<=:).*$)")
+    Return key
+}
+
+; bing & deepl 翻译, 将鼠标选中的文字翻译, 中英互译
+Translate(bingKey := "", deeplKey := "")
+{
+    text := GetSelectedText()
+    text := ParseCamelText(text)
+    isCN := IsCN(text)
+    result := "no response `;("
+    hasResult := False
+
+    if (RegExReplace(text, "\s") == "")
+        Return
+
+    If (bingKey && !hasResult)
+    {
+        from := isCN ? "zh-CN": "en"
+        to := !isCN ? "zh-CN" : "en"
+        bing := Bing(text, bingKey, from, to)
+        If (bing.text)
+        {
+            hasResult := True
+            result := bing.text
+        }
     }
+
+    If (deeplKey && !hasResult)
+    {
+        from := isCN ? "ZH": "EN"
+        to := !isCN ? "ZH-HANS" : "EN-US"
+        deepl := DeepL(text, deeplKey, from, to)
+        If (deepl.text)
+        {
+            hasResult := True
+            result := deepl.text
+        }
+    }
+    If (!hasResult)
+    {
+        MB("翻译失败, 请检查密钥或网络")
+        Return
+    }
+
+    ST_Show(result, "press 'c' to copy")
+
+    key := WaitForKey()
+    if (key == "c" || key == "C")
+        Clipboard := result
+
+    ST_Dismiss()
+}
+
+; 尝试通过剪贴板生成一个 api 并访问
+; 当前实现直接搜索和翻译
+RunUrl(title, url)
+{
+    content := GetSelectedText()
+    if ( RegExReplace(content, "\s") == "")
+    {
+        InputBox content, %title%, What To %title%?, , 330, 130
+        if (content == "")
+            Return
+    }
+    Run %url%%content% ; 'https://xxx.com?q=' + 'content'
+}
+
+; 映射 sendInput
+SendString(str)
+{
+    SendInput % str
+}
+
+; 运行并通过 splash text 反馈
+RunWithSplashText(path)
+{
+    Run % path
+    ST_Show("√", "", 800)
+}
+
+RunWaitString(command)
+{
+    head := "#NoTrayIcon`n#SingleInstance force`n#NoEnv`n#MaxHotkeysPerInterval 99000000`n#HotkeyInterval 99000000`n#KeyHistory 0`nListLines Off`nProcess, Priority, , A`nSetBatchLines, -1`nSetKeyDelay, -1, -1`nSetMouseDelay, -1`nSetDefaultMouseSpeed, 0`nSetWinDelay, -1`nSetControlDelay, -1`nSendMode Input`n"
+    tail := "`nExitApp"
+    order := head . command . tail
+    tempFile := A_ScriptDir . "\~tmp_" . A_TickCount . ".ahk"
+    FileDelete %tempFile% ; 删除旧的临时文件(如果存在)
+    FileAppend, %order%, %tempFile% ; 将代码写入临时文件
+    RunWait %A_AhkPath% /r "%tempFile%"
+    FileDelete %tempFile%
+}
+
+; 选中一段 url 比如 '/login/refresh' 或 'login/refresh'
+; 已经处理了是否开头是否为 '/'
+; 便于网易云 api 的调试
+RunLocalHost(url)
+{
+    content := GetSelectedText()
+    if (ErrorLevel || RegExReplace(content, "\s") == "")
+        Return
+    ; 检查起始字符是否为 '/'
+    if (SubStr(content, 1, 1) != "/")
+        content := "/" . content
+    Run %url%%content%
+}
+
+RunFolder(funcInstance, path := "")
+{
+    func := Func(funcInstance)
+    if (!IsFunc(func))
+        return {}
+
+    if (!path || !FileExist(path))
+    {
+        FileSelectFolder, path,, 3, 选择一个文件夹
+        if (!path) ; 取消
+            return {}
+    }
+
+    result := {}
+    RunFuncForDirectory(path, func, result)
+    return result
+}
+
+RunFuncForDirectory(path, funcInstance, ByRef result)
+{
+    Loop, %path%\*.*, 0, 1
+    {
+        If (A_LoopFileIsDir)
+            RunFuncForDirectory(A_LoopFileLongPath, funcInstance, result) ; 递归子目录
+        Else
+        {
+            Try
+            {
+                if (r := %funcInstance%(A_LoopFileFullPath))
+                    result[A_LoopFileLongPath] := r
+            }
+            Catch
+            {
+                Return
+            }
+        }
+    }
+}
+
+; 读取一个目录下的文本文件, 并提取函数定义并写入新的 txt 文件内
+ReadFileDescriptionForFolder()
+{
+    result := RunFolder("GetFuncDescriptionInFile")
+    If (!result.Count())
+        Return
+
+    FileSelectFile, savePath, S, file.txt, Save file, Text Documents (*.txt)
+    If (!savePath)
+        Return
+
+    content := ""
+    for index, value in result
+        content .= "[" . index . "]`n" . value . "`n`n"
+
+    If (!content)
+        Return
+
+    f := FileOpen(savePath, "w")
+    f.Write(content)
+    f.Close()
+
+    Run % savePath
 }
 
 ; ; 以下为弃用热字符串(已集成至 json 配置文件内)
@@ -211,10 +396,6 @@ GDUT_KeepAlive()
 ; ; 脚本目录
 ; :*:app\::
 ;     Run % A_ScriptDir
-; Return
-
-; :*:ed\::
-;     Run, ConfigEditor.ahk
 ; Return
 
 ; :*:ex\::
