@@ -28,7 +28,7 @@ ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents
 
 For index, value in manifest
 {
-    PraseObject(JSON.Load(fileContents[value]))
+    InitPools(JSON.Load(fileContents[value]))
 }
 
 global current := manifest[startFile]
