@@ -24,27 +24,22 @@ DllCall("ntdll\ZwSetTimerResolution", "Int", 5000, "Int", 1, "Int*", MyCurrentTi
 
 ;TODO 封装 file 读写、网络请求、json加密存取、消息封装：tooltip、splash、msgbox
 
-global configsDefaultJson := "[""configs"",""paths"",""urls""]"
+global configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
     , fileContents := {}
     , manifest := []
-    , password := ""
+    , password := A_Args[1]
 
-If (A_Args[1])
-{
-    password := A_Args[1]
+If (password) ; 带密码启动
     ConfigsReload(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
-}
 Else
-{
     ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
-}
 
 ST_Show("please wait")
 
 For index, value in manifest
 {
     obj := JSON.Load(fileContents[value])
-    PraseObject(obj)
+    InitPools(obj)
 }
 
 BuildHotStrings()
@@ -52,24 +47,15 @@ BuildRunnables()
 BuildCodes()
 
 global vsPAth := POOL_RUNNABLE.vs
+    , studentNumber := POOL_HOTSTRING["no"]
+    , studentPassword := POOL_HOTSTRING["pw"]
 
-loginHeadUrl := POOL_STATIC["login1"] . POOL_HOTSTRING["no"] . POOL_STATIC["login2"] . POOL_HOTSTRING["pw"] . POOL_STATIC["login3"]
+loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . studentNumber . POOL_STATIC["login3"]
 loginTailUrl := POOL_STATIC["login4"]
 
 ST_Dismiss()
-
-; Chrome_Run("https://localhost:47990/")
-
-; t := A_TickCount
-; r := RunCmd("netsh wlan show networks mode=bssid")
-; t := A_TickCount - t
-
-; MsgBox % DeepLTranslate("你妈", POOL_STATIC.deepl, "ZH", "EN-US")
-; MsgBox % DeepLTranslate("mom", "57e79a31-6bdc-41f0-abb9-dd11011320bb:fx")
-
-; "å¦"
-
-GDUT_KeepAlive()
+If (studentNumber && studentPassword)
+    GDUT_KeepAlive()
 Return
 
 ; :*:ct\::
@@ -288,8 +274,15 @@ SendString(str)
 ; 运行并通过 splash text 反馈
 RunWithSplashText(path)
 {
-    Run % path
-    ST_Show("√", "", 800)
+    Try
+    {
+        Run % path
+        ST_Show("✔", "", 800)
+    }
+    Catch
+    {
+        ST_Show("✖", "", 800)
+    }
 }
 
 RunWaitString(command)

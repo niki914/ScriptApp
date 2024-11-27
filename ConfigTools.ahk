@@ -40,7 +40,7 @@ IsUrl(str)
     return RegExMatch(str, "i)^https?://") > 0
 }
 
-PraseObject(obj, parent := "")
+InitPools(obj, parent := "")
 {
     If (!IsParsable(obj)) ; 不可解析
         Return
@@ -76,7 +76,7 @@ PraseObject(obj, parent := "")
     for key, value in obj
         If (IsParsable(value)) ; 递归解析
         {
-            PraseObject(value, key)
+            InitPools(value, key)
         }
         Else ; 值是基本类型
         {
@@ -109,7 +109,7 @@ BuildHotstring(funcName, key, value)
     Hotstring(hotstring, Func(funcName).Bind(value))
 }
 
-ConfigsReload(cPath, cDefault, password, ByRef contents, ByRef manifest)
+ConfigsReload(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
 {
     isFirst := GetFileSize(cPath) <= 0
 
