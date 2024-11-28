@@ -62,6 +62,10 @@ Return
 ;     Action_LoaclTunnel()
 ; Return
 
+:*:cy\::
+    Run, Crypter.ahk
+Return
+
 :*:ed\::
     Run, ConfigEditor.ahk
 Return
