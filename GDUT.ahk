@@ -22,8 +22,10 @@ GDUT_KeepAlive()
     Tag_GDUT:
     If (isWorking_GDUT)
         Return
+    isWorking_GDUT := True
     If (!Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 2) && GetCurrentWifi() == "gdut")
         ST_Show(GDUT_Login(), "gdut", 800)
+    isWorking_GDUT := False
     Return
 }
 
@@ -34,8 +36,11 @@ GDUT_Kill()
 
 GDUT()
 {
-    If(GDUT_Connect())
-        Return GDUT_Login()
+    Loop % retryCount_GDUT
+    {
+        If(GDUT_Connect())
+            Return GDUT_Login()
+    }
     Return "gdut wifi was not connected"
 }
 
@@ -53,13 +58,8 @@ GDUT_Connect()
 ; get 登录 gdut
 GDUT_Login()
 {
-    Loop % retryCount_GDUT
-    {
-        url := loginHeadUrl . GetIP("10") . loginTailUrl
-        result := GetRequest(url)
-        msg := FilterText(result.text, "i)""msg""\s*:\s*""(.+?)""")
-        If (msg)
-            Return msg
-    }
-    Return ""
+    url := loginHeadUrl . GetIP("10") . loginTailUrl
+    result := GetRequest(url)
+    msg := FilterText(result.text, "i)""msg""\s*:\s*""(.+?)""")
+    Return msg
 }

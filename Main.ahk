@@ -34,7 +34,7 @@ If (password) ; 带密码启动
 Else
     ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
 
-ST_Show("please wait")
+FT_Show("hello world", 1000)
 
 For index, value in manifest
 {
@@ -52,8 +52,6 @@ global vsPAth := POOL_RUNNABLE.vs
 
 loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . studentPassword . POOL_STATIC["login3"]
 loginTailUrl := POOL_STATIC["login4"]
-
-ST_Dismiss()
 
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
@@ -89,7 +87,7 @@ Return
 Return
 
 :*:``12::
-    Run, %A_AhkPath% Main.ahk %password%
+    Run, %A_AhkPath% %A_ScriptFullPath% %password%
 Return
 
 ; 通过 powershell 脚本启动热点
@@ -156,7 +154,9 @@ Return
 Return
 
 ^`:: ; 编辑 Main.ahk
-    Run %vsPAth% %A_ScriptFullPath%
+    If (!FileExist(vsPAth))
+        Return
+    Run %vsPAth% %A_ScriptDir%
 Return
 
 Alt & x:: ; 右键点击事件

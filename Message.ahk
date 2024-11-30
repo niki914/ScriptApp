@@ -21,7 +21,7 @@ FT_Show(message, time := 0)
   Return
 
   Tag_FT:
-  If (A_TickCount - start_FT > time_FT) ; 当超时
+  If (A_TickCount - start_FT > time_FT && time_FT > 0) ; 当超时
   {
     SetTimer, Tag_FT, Off
     ToolTip, , , , pid_FT
