@@ -13,8 +13,6 @@
 #Include Text.ahk
 #Include Libs\JSON.ahk
 
-global request_Net := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-
 ; bing api 翻译, 默认美式英语译简中
 Bing(text, apiKey, from := "en", to := "zh-CN")
 {
@@ -31,6 +29,7 @@ Bing(text, apiKey, from := "en", to := "zh-CN")
 }
 
 ; deepl api 翻译, 默认美式英语译简中
+
 DeepL(text, apiKey, from := "EN", to := "ZH-HANS")
 {
     StringUpper, from, from
@@ -89,19 +88,21 @@ GetRequest(url, timeout := 5)
 
     Try
     {
-        request_Net.Open("GET", url, True) ; false 为同步方法
-        request_Net.Send()
-        request_Net.WaitForResponse(timeout)
+        request := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        request.Open("GET", url, True) ; false 为同步方法
+        request.Send()
+        request.WaitForResponse(timeout)
 
-        code := request_Net.Status
-        body := request_Net.ResponseBody
-        text := request_Net.ResponseText
-        ; ObjRelease(request_Net)
+        code := request.Status
+        body := request.ResponseBody
+        text := request.ResponseText
+        ObjRelease(request)
 
         Return {code: code, text: text, time: A_TickCount - time, body: body}
     }
     Catch
     {
+        ObjRelease(request)
         Return {code: -1, text: "fail to get", time: A_TickCount - time}
     }
 }

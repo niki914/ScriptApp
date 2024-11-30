@@ -21,15 +21,16 @@ FT_Show(message, time := 0)
   Return
 
   Tag_FT:
-  If (time_FT <= 0)
-  {
-    ToolTip, %text_FT%, , , pid_FT
-  }
-  Else If (A_TickCount - start_FT > time_FT)
+  If (A_TickCount - start_FT > time_FT) ; 当超时
   {
     SetTimer, Tag_FT, Off
     ToolTip, , , , pid_FT
   }
+  Else ; 未满足消失条件, 刷新
+  {
+    ToolTip, %text_FT%, , , pid_FT
+  }
+
   Return
 }
 

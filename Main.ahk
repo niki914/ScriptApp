@@ -54,6 +54,7 @@ loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . 
 loginTailUrl := POOL_STATIC["login4"]
 
 ST_Dismiss()
+
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
 Return
@@ -226,11 +227,11 @@ Translate(bingKey := "", deeplKey := "")
         bing := Bing(text, bingKey, from, to)
         If (bing.text)
         {
+            ST_Show(bing.text, 800)
             hasResult := True
             result := bing.text
         }
     }
-
     If (deeplKey && !hasResult)
     {
         from := isCN ? "ZH": "EN"
@@ -238,23 +239,27 @@ Translate(bingKey := "", deeplKey := "")
         deepl := DeepL(text, deeplKey, from, to)
         If (deepl.text)
         {
+            ST_Show(deepl.text, 800)
             hasResult := True
             result := deepl.text
         }
     }
     If (!hasResult)
     {
-        MB("翻译失败, 请检查密钥或网络")
+        FT_Show("翻译失败, 请检查密钥或网络", 2000)
+        ; MB("翻译失败, 请检查密钥或网络")
         Return
     }
 
-    ST_Show(result, "press 'c' to copy")
+    FT_Show(result)
+    ; ST_Show(result, "press 'c' to copy")
 
     key := WaitForKey()
     if (key == "c" || key == "C")
         Clipboard := result
 
-    ST_Dismiss()
+    FT_Dismiss()
+    ; ST_Dismiss()
 }
 
 ; 尝试通过剪贴板生成一个 api 并访问
