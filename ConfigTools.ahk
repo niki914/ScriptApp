@@ -203,7 +203,7 @@ Guidance()
 ; 要求输入密码
 RequirePassword(msg)
 {
-    InputBox, str, , %msg%:
+    InputBox, str, , %msg%:, Hide
     if ErrorLevel ; 用户按下取消或关闭窗口
         Return -1
     Return str

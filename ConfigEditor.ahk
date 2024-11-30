@@ -76,7 +76,7 @@ Gui, Add, DropDownList, hWndhList vCurrent gSwitch w%listWidth%, %choices%
 Gui, Add, Button, hWndhButton1 x+%margin% gSaveCurrent w%buttonWidth% h30, 保存此表
 Gui, Add, Button, hWndhButton2 x+%margin% gChangePW w%buttonWidth% h30, 改密码保存
 Gui, Add, Button, hWndhButton3 x+%margin% gDeleteCurrent w%buttonWidth% h30, 删除此表
-Gui, Add, Button, hWndhButton4 x+%margin% gExitEditor w%buttonWidth% h30, 取消编辑
+Gui, Add, Button, hWndhButton4 x+%margin% gNewItem w%buttonWidth% h30, 新建项
 Gui, Add, Edit, hWndhEdit xs y+%margin% vedittext w%realWidth% h400
 Gui, Show,, Config Editor
 GuiControl, Text, edittext, % fileContents[current]
@@ -118,7 +118,29 @@ DeleteCurrent:
     MsgBox, 未实现。。。
 Return
 
-ExitEditor:
+NewItem:
+    Gui, Submit, NoHide
+    currentText := RTrim(edittext)
+
+    if (SubStr(currentText, 0) != "}")
+    {
+        MB("此功能要求必须是对象!")
+        Return
+    }
+
+    trimText := RTrim(SubStr(currentText, 1, StrLen(currentText) - 1)) ; 第一至倒二的字符串再 trim
+    If(SubStr(trimText, 0) != ",")
+        trimText.=","
+
+    trimText .= "`n""newItem"": {`n ""type"": """",`n ""value"": """"`n }`n}"
+
+    GuiControl, Text, edittext, %trimText%
+
+    cursorPos := InStr(trimText, "newItem")
+    SendMessage, 0xB1, cursorPos, cursorPos+7,, ahk_id %hEdit% ; 此处 cursor 的偏移似乎受换行符影响
+    ControlFocus,, ahk_id %hEdit%
+Return
+
 GuiClose:
 GuiEscape:
     If(isWorking)

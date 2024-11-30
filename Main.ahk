@@ -227,7 +227,6 @@ Translate(bingKey := "", deeplKey := "")
         bing := Bing(text, bingKey, from, to)
         If (bing.text)
         {
-            ST_Show(bing.text, 800)
             hasResult := True
             result := bing.text
         }
@@ -239,7 +238,6 @@ Translate(bingKey := "", deeplKey := "")
         deepl := DeepL(text, deeplKey, from, to)
         If (deepl.text)
         {
-            ST_Show(deepl.text, 800)
             hasResult := True
             result := deepl.text
         }
