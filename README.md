@@ -12,7 +12,7 @@
 1. 封装 web 请求
 1. Bing、DeepL 文本翻译 API
 
-![tran](readme_resources\tran.jpg)
+![tran](https://github.com/p1ay1s/ScriptApp/blob/main/readme_resources/tran.jpg)
 
 ### ui提示封装
 
@@ -23,7 +23,7 @@
 
 ### 适用于广东工业大学的校园网快连、自动检查和重新登录
 
-![gdut](readme_resources\gdut.png)
+![gdut](https://github.com/p1ay1s/ScriptApp/blob/main/readme_resources/gdut.png)
 
 ### 对二进制文件的文件读写以及异或加密工具
 
@@ -36,9 +36,9 @@
 1. ahk 代码  ( 可以在 json 中写入 ahk 代码并通过热键执行! )
 1. 文件路径以及网址
 
-![c1](readme_resources\config1.png)
+![c1](https://github.com/p1ay1s/ScriptApp/blob/main/readme_resources/config1.png)
 
-![c2](readme_resources\config2.png)
+![c2](https://github.com/p1ay1s/ScriptApp/blob/main/readme_resources/config2.png)
 
 ````json
 {
