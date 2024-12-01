@@ -29,6 +29,8 @@ global POOL_RUNNABLE := {}
     , POOL_STATIC := {}
     , POOL_HOTSTRING := {}
 
+    , configFolder := A_ScriptDir . "\Config\"
+
 IsParsable(v)
 {
     type := GetType(v)
@@ -105,42 +107,21 @@ BuildCodes()
 
 BuildHotstring(funcName, key, value)
 {
-    hotstring := ":*:" key "\"
+    hotstring := ":*:" .  key .  "\"
     Hotstring(hotstring, Func(funcName).Bind(value))
 }
 
 ConfigsReload(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
 {
-    isFirst := GetFileSize(cPath) <= 0
-
-    If (isFirst)
-        Guidance()
-
-    If (isFirst && !IsJson(cDefault))
-    {
-        MsgBox, 默认配置表不是合法的json语句，脚本将退出！
-        ExitApp
-    }
-
-    While 1
-    {
-        If (A_Index != 1)
-            password := RequirePassword("密码错误, 请重试!") ; 要求输入密码
-
-        If (password == -1)
-            ExitApp
-
-        configs := ReadCryptedJsonString(cPath, password, cDefault)
-        If (!configs)
-            Continue
-
-        manifest := JSON.Load(configs)
-        If (ReadConfigFiles(manifest, password, contents, "{}"))
-            Break
-    }
+    _ConfigsBuild(cPath, cDefault, password, contents, manifest, True)
 }
 
 ConfigsInit(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
+{
+    _ConfigsBuild(cPath, cDefault, password, contents, manifest, False)
+}
+
+_ConfigsBuild(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest, withPassword)
 {
     isFirst := GetFileSize(cPath) <= 0
 
@@ -173,7 +154,8 @@ ConfigsInit(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
                 msg := "密码不正确，请重试"
         }
 
-        password := RequirePassword(msg) ; 要求输入密码
+        If (!withPassword || A_Index != 1) ; 未传入密码或者进入了往后的循环(密码错误)
+            password := RequirePassword(msg) ; 要求输入密码
 
         If (password == -1)
             ExitApp
@@ -184,7 +166,10 @@ ConfigsInit(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
 
         manifest := JSON.Load(configs)
         If (ReadConfigFiles(manifest, password, contents, "{}"))
+        {
+            CleanUnregistereds(manifest)
             Break
+        }
     }
 }
 
@@ -321,7 +306,7 @@ AppendCryptFile(path, bytes, password)
 ; 生成配置文件路径
 GetConfigPath(name)
 {
-    Return A_ScriptDir . "\Config\" . name . ".cy"
+    Return configFolder . name . ".cy"
 }
 
 ; 根据字符串数组读取配置文件并在 outObj 返回读取到的对象
@@ -345,4 +330,28 @@ ReadConfigFiles(manifest, password, ByRef outObj, default)
 
     outObj := contents
     Return ok
+}
+
+CleanUnregistereds(manifest)
+{
+    Loop, Files, %configFolder%*.*
+    {
+        ; 检查是否是文件而不是目录
+        if InStr(FileExist(configFolder . A_LoopFileName), "D")
+            continue
+
+        fileName := StrSplit(A_LoopFileName, ".")[1]
+        isInManifest := False
+
+        for _, configName in manifest {
+            if (configName == fileName)
+            {
+                isInManifest := True
+                break
+            }
+        }
+
+        if (!isInManifest) ; 删除未注册的文件
+            FileDelete, %configFolder%%A_LoopFileName%
+    }
 }

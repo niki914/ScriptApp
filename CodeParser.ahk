@@ -22,7 +22,7 @@ GetFuncDescriptionInFile(filePath := "")
   If (!FileExist(filePath))
     FileSelectFile, filePath, 3, , 选择一个文件 ; 1 + 2 文件、路径都必须存在
 
-  if (!FileExist(filePath))
+  If (!FileExist(filePath))
     Return ""
 
   SplitPath, filePath, , , fileExt
@@ -43,23 +43,22 @@ GetFuncDescriptionInFile(filePath := "")
     newPos := RegExMatch(fileContent, pattern, match, pos)
     pos := newPos + StrLen(match1)
 
-    r := Trim(match1, "`n`r ")
-    If (r && !IsArrIncluding(keywords_CodeParser, FilterFuncName(r))) ; 筛选出为非内置关键字的函数
-      result .= r . "`n"
-  } Until (oldPos = pos) ; 位置不再变化则终止
+    re := Trim(match1, "`n`r ")
+    
+    ; 筛选出为非内置关键字的函数
+    ; 逻辑: 提取函数名字串, 转小写后与设定的关键字数组比对, 如果不是关键字并且不是空字串则拼接到字符串内
+    If (re && !IsArrIncluding(keywords_CodeParser, FilterFuncName(re))) 
+      result .= re . "`n"
+  } Until (oldPos = pos) ; 字串指针位置不再变化则终止
 
   Return result
 }
 
-; 读取一个目录下的文本文件, 并提取函数定义并写入新的 txt 文件内
+; 读取一个目录下的文本文件并提取函数定义
 ReadFileDescriptionForFolder()
 {
   result := RunFolder("GetFuncDescriptionInFile")
   If (!result.Count())
-    Return
-
-  FileSelectFile, savePath, S, file.txt, Save file, Text Documents (*.txt)
-  If (!savePath)
     Return
 
   content := ""
@@ -67,15 +66,6 @@ ReadFileDescriptionForFolder()
     content .= "[" . index . "]`n" . value . "`n`n"
 
   Return content
-
-  ; If (!content)
-  ;     Return
-
-  ; f := FileOpen(savePath, "w")
-  ; f.Write(content)
-  ; f.Close()
-
-  ; Run % savePath
 }
 
 ; 提取函数名
@@ -93,7 +83,7 @@ IsArrIncluding(array, expect)
   for index, value in array
   {
     StringLower, value, value
-    if (value == expect)
+    If (value == expect)
       Return true
   }
   Return False

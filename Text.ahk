@@ -6,6 +6,9 @@
 ; FilterText(text, pattern)
 ; ReverseText(text)
 ; ParseCamelText(text)
+; RunFolder(funcInstance, path := "")
+; RunFuncForDirectory(path, funcInstance, ByRef result)
+
 
 ; 字节数组转字符串, 默认 utf-8
 BytesToString(bytes, encoding := "UTF-8") {
@@ -117,4 +120,43 @@ ParseCamelText(text)
     }
 
     return result
+}
+
+RunFolder(funcInstance, path := "")
+{
+    func := Func(funcInstance)
+    if (!IsFunc(func))
+        return {}
+
+    if (!path || !FileExist(path))
+    {
+        FileSelectFolder, path,, 3, 选择一个文件夹
+        if (!path) ; 取消
+            return {}
+    }
+
+    result := {}
+    RunFuncForDirectory(path, func, result)
+    return result
+}
+
+RunFuncForDirectory(path, funcInstance, ByRef result)
+{
+    Loop, %path%\*.*, 0, 1
+    {
+        If (A_LoopFileIsDir)
+            RunFuncForDirectory(A_LoopFileLongPath, funcInstance, result) ; 递归子目录
+        Else
+        {
+            Try
+            {
+                if (r := %funcInstance%(A_LoopFileFullPath))
+                    result[A_LoopFileLongPath] := r
+            }
+            Catch
+            {
+                Return
+            }
+        }
+    }
 }

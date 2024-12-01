@@ -1,4 +1,4 @@
-﻿#Include ALL.ahk
+﻿#Include %A_ScriptDir%\ALL.ahk
 
 ; #Include Lao\Chrome\Chrome.ahk
 
@@ -21,8 +21,6 @@ SetControlDelay, -1
 SendMode Input
 DllCall("ntdll\ZwSetTimerResolution", "Int", 5000, "Int", 1, "Int*", MyCurrentTimerResolution) ; setting the Windows Timer Resolution to 0.5ms, THIS IS A GLOBAL CHANGE
 ; 加快脚本运行速度的设置
-
-;TODO 封装 file 读写、网络请求、json加密存取、消息封装：tooltip、splash、msgbox
 
 global configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
     , fileContents := {}
@@ -318,45 +316,6 @@ RunLocalHost(url)
     if (SubStr(content, 1, 1) != "/")
         content := "/" . content
     Run %url%%content%
-}
-
-RunFolder(funcInstance, path := "")
-{
-    func := Func(funcInstance)
-    if (!IsFunc(func))
-        return {}
-
-    if (!path || !FileExist(path))
-    {
-        FileSelectFolder, path,, 3, 选择一个文件夹
-        if (!path) ; 取消
-            return {}
-    }
-
-    result := {}
-    RunFuncForDirectory(path, func, result)
-    return result
-}
-
-RunFuncForDirectory(path, funcInstance, ByRef result)
-{
-    Loop, %path%\*.*, 0, 1
-    {
-        If (A_LoopFileIsDir)
-            RunFuncForDirectory(A_LoopFileLongPath, funcInstance, result) ; 递归子目录
-        Else
-        {
-            Try
-            {
-                if (r := %funcInstance%(A_LoopFileFullPath))
-                    result[A_LoopFileLongPath] := r
-            }
-            Catch
-            {
-                Return
-            }
-        }
-    }
 }
 
 ; ; 以下为弃用热字符串(已集成至 json 配置文件内)
