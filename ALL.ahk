@@ -1,11 +1,11 @@
-﻿#Include Message.ahk
-#Include CodeParser.ahk
-#Include Text.ahk
-#Include CMD.ahk
-#Include GDUT.ahk
-#Include Net.ahk
-#Include ConfigTools.ahk
-#Include FileTools.ahk
+﻿#Include %A_ScriptDir%\Message.ahk
+#Include %A_ScriptDir%\CodeParser.ahk
+#Include %A_ScriptDir%\Text.ahk
+#Include %A_ScriptDir%\CMD.ahk
+#Include %A_ScriptDir%\GDUT.ahk
+#Include %A_ScriptDir%\Net.ahk
+#Include %A_ScriptDir%\ConfigTools.ahk
+#Include %A_ScriptDir%\FileTools.ahk
 
 ; global localhostPath := A_ScriptDir . "\base_url.txt"
 

@@ -9,7 +9,7 @@
 ; GetFileSize(path)
 ; XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
 
-#Include Text.ahk
+#Include %A_ScriptDir%\Text.ahk
 
 ; 读取文件为字节数组, batches 为单次缓存数量
 ReadBytes(path, batchSize := 4096) {

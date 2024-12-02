@@ -1,4 +1,4 @@
-﻿#Include Message.ahk
+﻿#Include %A_ScriptDir%\Message.ahk
 
 #Persistent
 #SingleInstance force ; 单例模式
@@ -17,7 +17,6 @@ SetDefaultMouseSpeed, 0
 SetWinDelay, -1
 SetControlDelay, -1
 SendMode Input
-DllCall("ntdll\ZwSetTimerResolution", "Int", 5000, "Int", 1, "Int*", MyCurrentTimerResolution) ; setting the Windows Timer Resolution to 0.5ms, THIS IS A GLOBAL CHANGE
 ; 加快脚本运行速度的设置
 
 global stay := 1500

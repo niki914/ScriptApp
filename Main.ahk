@@ -19,7 +19,6 @@ SetDefaultMouseSpeed, 0
 SetWinDelay, -1
 SetControlDelay, -1
 SendMode Input
-DllCall("ntdll\ZwSetTimerResolution", "Int", 5000, "Int", 1, "Int*", MyCurrentTimerResolution) ; setting the Windows Timer Resolution to 0.5ms, THIS IS A GLOBAL CHANGE
 ; 加快脚本运行速度的设置
 
 global configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
@@ -53,6 +52,7 @@ loginTailUrl := POOL_STATIC["login4"]
 
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
+
 Return
 
 ; :*:ct\::
@@ -66,6 +66,9 @@ Return
 :*:ed\::
     Run, ConfigEditor.ahk
 Return
+
+:*:ex\::
+ExitApp
 
 :*:rd\::
     t := GetFuncDescriptionInFile()
@@ -85,6 +88,7 @@ Return
 Return
 
 :*:``12::
+:*:21``::
     Run, %A_AhkPath% %A_ScriptFullPath% %password%
 Return
 

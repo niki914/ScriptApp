@@ -20,9 +20,9 @@
 ; GetConfigPath(name)
 ; ReadConfigFiles(manifest, password, ByRef outObj, default)
 
-#Include FileTools.ahk
-#Include Message.ahk
-#Include Libs\JSON.ahk
+#Include %A_ScriptDir%\FileTools.ahk
+#Include %A_ScriptDir%\Message.ahk
+#Include %A_ScriptDir%\Libs\JSON.ahk
 
 global POOL_RUNNABLE := {}
     , POOL_CODE := {}

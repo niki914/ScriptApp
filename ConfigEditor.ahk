@@ -1,8 +1,9 @@
-﻿#Include ConfigTools.ahk
+﻿#Include %A_ScriptDir%\ConfigTools.ahk
 
 #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式
 
+; 加快脚本运行速度的设置
 #NoEnv
 #MaxHotkeysPerInterval 99000000
 #HotkeyInterval 99000000
@@ -16,6 +17,7 @@ SetDefaultMouseSpeed, 0
 SetWinDelay, -1
 SetControlDelay, -1
 SendMode Input
+; 加快脚本运行速度的设置
 
 global startFile := 1 ; 设置不当可能会使脚本直接退出, 1 为循环首索引
     , configsDefaultJson := "[""configs"",""applications"",""urls""]"

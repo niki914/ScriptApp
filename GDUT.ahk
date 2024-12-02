@@ -4,8 +4,8 @@
 ; GDUT_Connect()
 ; GDUT_Login()
 
-#Include Net.ahk
-#Include Message.ahk
+#Include %A_ScriptDir%\Net.ahk
+#Include %A_ScriptDir%\Message.ahk
 
 global ssid_GDUT := "gdut"
     , retryCount_GDUT := 5
@@ -58,6 +58,11 @@ GDUT_Connect()
 ; get 登录 gdut
 GDUT_Login()
 {
+    If (!loginHeadUrl)
+    {
+        MB("还未设置校园网 baseurl, 请看 main.ahk 中的 loginHeadUrl 参数")
+        Return ""
+    }
     url := loginHeadUrl . GetIP("10") . loginTailUrl
     result := GetRequest(url)
     msg := FilterText(result.text, "i)""msg""\s*:\s*""(.+?)""")

@@ -1,5 +1,5 @@
-﻿#Include FileTools.ahk
-#Include Message.ahk
+﻿#Include %A_ScriptDir%\FileTools.ahk
+#Include %A_ScriptDir%\Message.ahk
 
 #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式

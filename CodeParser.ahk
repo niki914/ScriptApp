@@ -2,7 +2,7 @@
 ; FilterFuncName(str)
 ; IsArrIncluding(array, expect)
 
-#Include Text.ahk
+#Include %A_ScriptDir%\Text.ahk
 
 ; 识别函数定义的正则
 ; 必须加个括号在外面才能保存
