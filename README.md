@@ -2,6 +2,14 @@
 
 [TOC]
 
+## 主程序使用方法
+
+1. Config 文件夹内是开发者自己的配置, 直接删除 Config 文件夹
+2. 直接 autohotkey v1 启动 main.ahk 即可
+3. 设置一个用于异或加密本地配置的密码
+4. 按下 `ed\` 来启动编辑器, 目前开发者习惯使用 `\` 作为确认键, 所以大多的热字串都是以它结束, 具体请看下方的示例
+5. 你可以在 ConfigEditor 中创建自己的表, 并点击新建项来快速创建一个配置
+
 ## 功能
 
 ### 网络
@@ -29,6 +37,8 @@
 
 ### 基于 json 的配置文件存取 ( 在主脚本运行后动态加载配置文件中写入的信息 )
 
+建议用专业的 json 编辑器来编辑
+
 可存储并执行的类型:
 
 1. 脚本内置常量 ( 加载至代码内的常量, 可以是你的翻译 api key 等 )
@@ -43,29 +53,25 @@
 ````json
 {
     "as": {
-        "type": "runnable",
+        "type": "runnable", ; 效果: 按下 `as\` 时启动 AndroidStudio
         "value": "D:\\*****\\Androidstudio\\bin\\studio64.exe"
     },
     "sl": {
-        "type": "code",
+        "type": "code", ; 效果: 按下 `sl\` 执行 value 中的代码, 使机器休眠
         "value": "DllCall(\"PowrProf\\SetSuspendState\", \"int\", 0, \"int\", 0, \"int\", 0)"
     },
-    "szk": {
-        "type": "code",
-        "value": "RunWait %ComSpec% /c adb devices, , Hide\n    RunWait %ComSpec% /c adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh, , Hide"
-    },
     "gh": {
-        "type": "runnable",
+        "type": "runnable", ; 效果: 按下 `gh\` 使用默认浏览器打开 github
         "value": "https://github.com/"
     },
-    "qq": {
+    "qq": { ; 效果: 按下 `qq\` 直接将 `qq\` 替换为 qq 号码
         "type": "hotString",
         "value": "340****095"
     }
 }
 ````
 
-### 上述配置文件存储系统的编辑器
+### ConfigEditor.ahk: 上述配置文件存储系统的编辑器
 
 ### 函数定义分析器
 
@@ -88,6 +94,8 @@
 ````
 
 ### CMD 命令执行并返回运行结果
+
+### Crypter.ahk: 基于异或加密的二进制文件加密工具
 
 ## 代码分块 ( 使用函数定义分析器读取 )
 

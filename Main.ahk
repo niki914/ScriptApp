@@ -60,11 +60,11 @@ Return
 ; Return
 
 :*:cy\::
-    Run, Crypter.ahk
+    Run, %A_ScriptDir%\Crypter.ahk
 Return
 
 :*:ed\::
-    Run, ConfigEditor.ahk
+    Run, %A_ScriptDir%\ConfigEditor.ahk
 Return
 
 :*:ex\::

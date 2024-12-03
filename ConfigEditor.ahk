@@ -109,7 +109,7 @@ SaveCurrent:
 
     isWorking := False
     MsgBox, 已保存: %path%
-    Run, %A_AhkPath% Main.ahk %password%
+    Run, %A_AhkPath% %A_ScriptDir%\Main.ahk %password%
 Return
 
 ChangePW:
