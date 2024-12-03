@@ -107,7 +107,7 @@ BuildCodes()
 
 BuildHotstring(funcName, key, value)
 {
-    hotstring := ":*:" .  key .  "\"
+    hotstring := ":*:" . key . "\"
     Hotstring(hotstring, Func(funcName).Bind(value))
 }
 
@@ -151,10 +151,12 @@ _ConfigsBuild(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest, w
                 ExitApp
             }
             Else
+            {
                 msg := "密码不正确，请重试"
+            }
         }
 
-        If (!withPassword || A_Index != 1) ; 未传入密码或者进入了往后的循环(密码错误)
+        If (password == "" || !withPassword || A_Index != 1) ; 未传入密码或者进入了往后的循环(密码错误)
             password := RequirePassword(msg) ; 要求输入密码
 
         If (password == -1)

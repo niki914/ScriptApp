@@ -12,7 +12,7 @@
 1. 封装 web 请求
 1. Bing、DeepL 文本翻译 API
 
-![tran](https://github.com/p1ay1s/ScriptApp/blob/main/readme_resources/tran.jpg)
+![tran](https://github.com/p1ay1s/ScriptApp/blob/main/readme_resources/tran.png)
 
 ### ui提示封装
 
