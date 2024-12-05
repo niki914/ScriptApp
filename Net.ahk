@@ -9,7 +9,7 @@
 ; ConnectWifi(ssid)
 ; DisconnectWifi()
 
-#Include %A_ScriptDir%\CMD.ahk
+#Include %A_ScriptDir%\System.ahk
 #Include %A_ScriptDir%\Text.ahk
 #Include %A_ScriptDir%\Libs\JSON.ahk
 

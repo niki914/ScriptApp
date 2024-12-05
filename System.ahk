@@ -27,3 +27,19 @@ RunCmd(command, timeout := 0.3)
     Clipboard := ClipSaved ; 使用 Clipboard (不是 ClipboardAll)
     Return result
 }
+
+RunThisAsAdmin()
+{
+    if !(A_IsAdmin || InStr(DllCall("GetCommandLine", "Str"), ".exe /r"))
+        RunWait % "*RunAs " ( _ := A_IsCompiled ? """" : A_AhkPath " /r """) A_ScriptFullPath (_ ? """" : """ /r")
+}
+
+WinShutDown()
+{
+    Shutdown, 1
+}
+
+WinSleep()
+{
+    DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
+}

@@ -181,46 +181,51 @@ GetFileSize(path)
     return size
 }
 
-; 异或加密一个文件到指定路径, 默认缓存大小为 10M
-XORFile(inFilePath, outFilePath, password, bufferSize := 4096) {
-    If (GetType(bufferSize) != "number" || bufferSize <= 0)
-        Return "invalid buffer size"
-    If (!FileExist(inFilePath))
-        Return "input file not found"
-
-    fileIn := GetReadFile(inFilePath)
-    fileOut := GetEmptyFile(outFilePath)
-
-    if(!fileIn || !fileOut)
-    {
-        fileIn.Close()
-        fileOut.Close()
-        Return "cannot get files"
-    }
-
-    VarSetCapacity(buffer, bufferSize)
-
-    pwBytes := StringToBytes(password)
-    pwLength := pwBytes.Length()
-
-    ; 读取、加密并写入
-    while (bytesRead := fileIn.RawRead(&buffer, bufferSize))
-    {
-        Loop % bytesRead ; 对每个字节进行异或操作
-        {
-            pwIndex := Mod(A_Index - 1, pwLength) + 1
-            dataByte := NumGet(buffer, A_Index - 1, "UChar") ; 已经读至缓冲区的字节
-            pwByte := pwBytes[pwIndex]
-            encryptedByte := dataByte ^ pwByte
-            NumPut(encryptedByte, buffer, A_Index - 1, "UChar")
-
-            passwordIndex++
-        }
-
-        fileOut.RawWrite(&buffer, bytesRead)
-    }
-
-    fileIn.Close()
-    fileOut.Close()
-    Return "success"
+XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
+{
+    return DllCall("Libs\XOR.dll\XORFile", "Str", inFilePath, "Str", outFilePath, "Str", password, "Int", bufferSize)
 }
+
+; ; 异或加密一个文件到指定路径, 默认缓存大小为 10M
+; XORFile(inFilePath, outFilePath, password, bufferSize := 4096) {
+;     If (GetType(bufferSize) != "number" || bufferSize <= 0)
+;         Return "invalid buffer size"
+;     If (!FileExist(inFilePath))
+;         Return "input file not found"
+
+;     fileIn := GetReadFile(inFilePath)
+;     fileOut := GetEmptyFile(outFilePath)
+
+;     if(!fileIn || !fileOut)
+;     {
+;         fileIn.Close()
+;         fileOut.Close()
+;         Return "cannot get files"
+;     }
+
+;     VarSetCapacity(buffer, bufferSize)
+
+;     pwBytes := StringToBytes(password)
+;     pwLength := pwBytes.Length()
+
+;     ; 读取、加密并写入
+;     while (bytesRead := fileIn.RawRead(&buffer, bufferSize))
+;     {
+;         Loop % bytesRead ; 对每个字节进行异或操作
+;         {
+;             pwIndex := Mod(A_Index - 1, pwLength) + 1
+;             dataByte := NumGet(buffer, A_Index - 1, "UChar") ; 已经读至缓冲区的字节
+;             pwByte := pwBytes[pwIndex]
+;             encryptedByte := dataByte ^ pwByte
+;             NumPut(encryptedByte, buffer, A_Index - 1, "UChar")
+
+;             passwordIndex++
+;         }
+
+;         fileOut.RawWrite(&buffer, bytesRead)
+;     }
+
+;     fileIn.Close()
+;     fileOut.Close()
+;     Return "success"
+; }

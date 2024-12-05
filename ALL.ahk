@@ -1,7 +1,7 @@
 ﻿#Include %A_ScriptDir%\Message.ahk
 #Include %A_ScriptDir%\CodeParser.ahk
 #Include %A_ScriptDir%\Text.ahk
-#Include %A_ScriptDir%\CMD.ahk
+#Include %A_ScriptDir%\System.ahk
 #Include %A_ScriptDir%\GDUT.ahk
 #Include %A_ScriptDir%\Net.ahk
 #Include %A_ScriptDir%\ConfigTools.ahk

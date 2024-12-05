@@ -18,6 +18,8 @@ SetWinDelay, -1
 SetControlDelay, -1
 SendMode Input
 
+OnMessage(4564, "SetProgress")
+
 global tWidth := 70
     , eWidth := 300
     , bWidth := 80
@@ -106,56 +108,67 @@ return
 
 XORFileTelling(inFilePath, outFilePath, password)
 {
-    bufferSize := 2048
-    tick := A_TickCount
-    
-    If (inFilePath == outFilePath)
-        Return "设置了相同的路径, 这是一个不安全的操作"
-    If (GetType(bufferSize) != "number" || bufferSize <= 0)
-        Return "缓存大小设置有误: " . bufferSize
-    If (!FileExist(inFilePath))
-        Return "原文件不存在"
-
-    fileIn := FileOpen(inFilePath, "r")
-    fileOut := GetEmptyFile(outFilePath)
-
-    if(!fileIn || !fileOut)
-    {
-        if (fileIn)
-            fileIn.Close()
-        if (fileOut)
-            fileOut.Close()
-        Return "文件获取失败"
-    }
-
-    VarSetCapacity(buffer, bufferSize)
-
-    pwBytes := StrSplit(password)
-    pwLength := StrLen(password)
-
-    fileSize := fileIn.Length
-    processedBytes := 0
-
-    ; 读取、加密并写入
-    while (bytesRead := fileIn.RawRead(&buffer, bufferSize))
-    {
-        Loop % bytesRead ; 对每个字节进行异或操作
-        {
-            pwIndex := Mod(A_Index - 1, pwLength) + 1
-            dataByte := NumGet(buffer, A_Index - 1, "UChar")
-            pwByte := Asc(pwBytes[pwIndex])
-            encryptedByte := dataByte ^ pwByte
-            NumPut(encryptedByte, buffer, A_Index - 1, "UChar")
-        }
-
-        fileOut.RawWrite(&buffer, bytesRead)
-        processedBytes += bytesRead
-        progress := Round((processedBytes / fileSize) * 100)
-        GuiControl,, ProgressBar, %progress%
-    }
-
-    fileIn.Close()
-    fileOut.Close()
-    GuiControl,, ProgressBar, 100
-    Return (A_TickCount - tick)
+    return DllCall("Libs\XOR.dll\XORFile", "Str", inFilePath, "Str", outFilePath, "Str", password, "Int", 4096, "ptr", A_ScriptHwnd)
 }
+
+SetProgress(v)
+{
+    MB(v)
+    GuiControl,, ProgressBar, %v%
+}
+
+; XORFileTelling1(inFilePath, outFilePath, password)
+; {
+;     bufferSize := 2048
+;     tick := A_TickCount
+
+;     If (inFilePath == outFilePath)
+;         Return "设置了相同的路径, 这是一个不安全的操作"
+;     If (GetType(bufferSize) != "number" || bufferSize <= 0)
+;         Return "缓存大小设置有误: " . bufferSize
+;     If (!FileExist(inFilePath))
+;         Return "原文件不存在"
+
+;     fileIn := FileOpen(inFilePath, "r")
+;     fileOut := GetEmptyFile(outFilePath)
+
+;     if(!fileIn || !fileOut)
+;     {
+;         if (fileIn)
+;             fileIn.Close()
+;         if (fileOut)
+;             fileOut.Close()
+;         Return "文件获取失败"
+;     }
+
+;     VarSetCapacity(buffer, bufferSize)
+
+;     pwBytes := StrSplit(password)
+;     pwLength := StrLen(password)
+
+;     fileSize := fileIn.Length
+;     processedBytes := 0
+
+;     ; 读取、加密并写入
+;     while (bytesRead := fileIn.RawRead(&buffer, bufferSize))
+;     {
+;         Loop % bytesRead ; 对每个字节进行异或操作
+;         {
+;             pwIndex := Mod(A_Index - 1, pwLength) + 1
+;             dataByte := NumGet(buffer, A_Index - 1, "UChar")
+;             pwByte := Asc(pwBytes[pwIndex])
+;             encryptedByte := dataByte ^ pwByte
+;             NumPut(encryptedByte, buffer, A_Index - 1, "UChar")
+;         }
+
+;         fileOut.RawWrite(&buffer, bytesRead)
+;         processedBytes += bytesRead
+;         progress := Round((processedBytes / fileSize) * 100)
+;         GuiControl,, ProgressBar, %progress%
+;     }
+
+;     fileIn.Close()
+;     fileOut.Close()
+;     GuiControl,, ProgressBar, 100
+;     Return (A_TickCount - tick)
+; }

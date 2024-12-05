@@ -21,6 +21,8 @@ SetControlDelay, -1
 SendMode Input
 ; 加快脚本运行速度的设置
 
+RunThisAsAdmin()
+
 global configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
     , fileContents := {}
     , manifest := []
@@ -31,7 +33,8 @@ If (password) ; 带密码启动
 Else
     ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
 
-FT_Show("hello world", 1000)
+adminType := A_IsAdmin ? "(admin)" : ""
+FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
 For index, value in manifest
 {
@@ -53,11 +56,61 @@ loginTailUrl := POOL_STATIC["login4"]
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
 
-Return
+; SoundGet, O, MASTER
+; MB(Round(O))
+
+; ; 下面的 DllCall 是可选的: 它告诉操作系统要首先关闭此脚本(在其他所有程序之前).
+; DllCall("kernel32.dll\SetProcessShutdownParameters", "UInt", 0x04FF, "UInt", 0)
+; OnMessage(0x11, "WM_QUERYENDSESSION")
+; OnMessage(0x218, "WM_POWERBROADCAST")
+return
+
+WM_POWERBROADCAST(wParam)
+{
+    If (wParam == 10)
+        Return True
+
+    if (wParam == 18)
+        MB("welcome back!")
+    Else
+        MB(wParam)
+
+    Return True
+}
+
+WM_QUERYENDSESSION(wParam, lParam)
+{
+    ENDSESSION_LOGOFF := 0x80000000
+    if (lParam & ENDSESSION_LOGOFF) ; 用户正在注销.
+        EventType := "Logoff"
+    else ; 系统正在关机或重启.
+        EventType := "Shutdown"
+    FT_Show(EventType)
+
+    XORFile("C:\Users\NIKI\Desktop\图片\blk.jpeg", "C:\Users\NIKI\Desktop\blkasd.jpeg", "asd", 4096)
+
+    Try
+    {
+        DllCall("ShutdownBlockReasonCreate", "ptr", A_ScriptHwnd, "wstr", EventType)
+        return false
+    }
+    Catch
+    {
+        return false
+    }
+}
 
 ; :*:ct\::
 ;     Action_LoaclTunnel()
 ; Return
+
+; :*:shut\::
+;     WinShutDown()
+; Return
+
+:*:sl\::
+    WinSleep()
+Return
 
 :*:cy\::
     Run, %A_ScriptDir%\Crypter.ahk
