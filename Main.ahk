@@ -18,20 +18,22 @@ SetMouseDelay, -1
 SetDefaultMouseSpeed, 0
 SetWinDelay, -1
 SetControlDelay, -1
-SendMode Input
 ; 加快脚本运行速度的设置
 
 RunThisAsAdmin()
 
-global configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
-    , fileContents := {}
+global fileContents := {}
     , manifest := []
     , password := A_Args[1]
 
-If (password) ; 带密码启动
-    ConfigsReload(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
-Else
-    ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
+    , lastReloadTime := A_Args[2]
+
+ReadConfigsToScript(password, fileContents, manifest, lastReloadTime)
+
+; If (password && !IsOutOfDate(lastReloadTime, REQUIRE_PASSWORD_MAX)) ; 带密码启动
+;     ConfigsReload(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
+; Else
+;     ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
 
 adminType := A_IsAdmin ? "(admin)" : ""
 FT_Show("hello! " . A_UserName . " " . adminType, 1500)
@@ -63,6 +65,24 @@ If (studentNumber && studentPassword)
 ; DllCall("kernel32.dll\SetProcessShutdownParameters", "UInt", 0x04FF, "UInt", 0)
 ; OnMessage(0x11, "WM_QUERYENDSESSION")
 ; OnMessage(0x218, "WM_POWERBROADCAST")
+
+; AutoHotkey 脚本
+
+; 定义字符串
+; str := "a1s 2d3"
+
+; byteArray := StringToBytes(str, "CP0") ; CP0 表示使用 ANSI 编码
+
+; Loop % byteArray.Length()
+; {
+;     MsgBox % byteArray[A_Index]
+; }
+
+; WinGetTitle, scriptTitle, % "ahk_pid " DllCall("GetCurrentProcessId")
+; MsgBox, % scriptTitle
+
+; Clipboard := GetFileSize("D:\movie\你的名字.mp4")
+
 return
 
 WM_POWERBROADCAST(wParam)
@@ -108,6 +128,10 @@ WM_QUERYENDSESSION(wParam, lParam)
 ;     WinShutDown()
 ; Return
 
+:*:lh\::
+    RunPenetration("1234")
+Return
+
 :*:sl\::
     WinSleep()
 Return
@@ -117,7 +141,7 @@ Return
 Return
 
 :*:ed\::
-    Run, %A_ScriptDir%\ConfigEditor.ahk
+    RunAhk(A_ScriptDir . "\ConfigEditor.ahk", password . " " . lastReloadTime)
 Return
 
 :*:ex\::
@@ -142,7 +166,8 @@ Return
 
 :*:``12::
 :*:21``::
-    Run, %A_AhkPath% %A_ScriptFullPath% %password%
+    RunAhk(A_ScriptFullPath, password . " " . lastReloadTime)
+; Run, %A_AhkPath% %A_ScriptFullPath% %password%
 Return
 
 ; 通过 powershell 脚本启动热点
@@ -373,6 +398,76 @@ RunLocalHost(url)
     if (SubStr(content, 1, 1) != "/")
         content := "/" . content
     Run %url%%content%
+}
+
+RunPenetration(port := "3000")
+{
+    timeout_RP := 20 * 1000 ; 20s 的超时
+    order := "ssh -R 80:localhost:" . port . " localhost.run"
+
+    Run cmd.exe
+
+    Sleep, 1000
+    SendInput % order
+    SendInput, {Enter}
+    SendInput, {Enter}
+
+    SetTitleMatchMode, 2
+    IfWinExist, cmd.exe
+    {
+        BlockInput, On
+        WinMaximize
+    }
+    Else
+    {
+        Return ""
+    }
+
+    Sleep, 500
+    WinGetPos, X, Y, Width, Height, A
+
+    StartX := (X + Width) * 0.8
+    StartY := (Y + Height) * 0.8
+    EndX := X
+    EndY := Y
+
+    startTime_RP := A_TickCount
+    ; 模拟人选中的动作直到选中的内容包含内网穿透的地址
+    While 1
+    {
+        SetDefaultMouseSpeed, 0
+        Click, %StartX%, %StartY%, Down ; 按下鼠标左键
+        SetDefaultMouseSpeed, 20
+        Click, %EndX%, %EndY%, Up ; 释放鼠标
+
+        result := ""
+        previous := ClipboardAll ; backup
+
+        Clipboard := ""
+        SendInput, ^c
+        ClipWait, 0.5
+
+        result := Clipboard
+        result := Trim(result, "`n`r ")
+        result := FilterText(result, "(http.+?.life)")
+
+        Clipboard := previous ; restitute
+
+        If (result)
+        {
+            Clipboard := result
+            Break
+        }
+        If (A_TickCount - startTime_RP >= timeout_RP)
+            Break
+
+        Sleep, 500
+    }
+
+    WinMinimize
+    BlockInput, Off
+
+    Return result
 }
 
 ; ; 以下为弃用热字符串(已集成至 json 配置文件内)

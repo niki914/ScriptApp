@@ -30,6 +30,10 @@ global POOL_RUNNABLE := {}
     , POOL_HOTSTRING := {}
 
     , configFolder := A_ScriptDir . "\Config\"
+    , configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
+    , REQUIRE_PASSWORD_MAX := 7 * 24 * 60 * 60 * 1000 ; 7 days
+
+    , configNameStr := "configs"
 
 IsParsable(v)
 {
@@ -185,6 +189,38 @@ Guidance()
     MB("使用高级功能的话需要设置两个变量:`n""type"": $str`n""value"": $str")
     MB("type:`n hotString => 可展开的热字符串`n static => 内部的静态变量`n runnable =>可运行路径, 完整的文件路径和url均可 `n code => ahk代码`n`n必须为其中之一，否则视作static")
     MB("示例: `n{`n""vs"":{""type"":""runnable"",""value"": ""D:\vscode.exe""}`n}")
+}
+
+ReadConfigsToScript(ByRef pw_br, ByRef contents_br, ByRef manifest_br, ByRef lastSet_br)
+{
+    If (pw_br && !IsOutOfDate(lastSet_br, REQUIRE_PASSWORD_MAX)) ; 带密码启动
+    {
+        ConfigsReload(GetConfigPath(configNameStr), configsDefaultJson, pw_br, contents_br, manifest_br)
+    }
+    Else
+    {
+        ConfigsInit(GetConfigPath(configNameStr), configsDefaultJson, pw_br, contents_br, manifest_br)
+        lastSet_br := A_TickCount
+    }
+    Return
+}
+
+; lastSet 是否过期
+IsOutOfDate(lastSet, maxSet)
+{
+    If (GetType(lastSet) != "number")
+        Return True
+
+    rest := A_TickCount - lastSet
+
+    Return rest >= maxSet
+}
+
+RunAhk(dir, extra := "")
+{
+    If (!FileExist(dir))
+        Return
+    Run, %A_AhkPath% %dir% %extra%
 }
 
 ; 要求输入密码

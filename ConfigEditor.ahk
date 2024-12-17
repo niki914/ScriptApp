@@ -20,13 +20,15 @@ SendMode Input
 ; 加快脚本运行速度的设置
 
 global startFile := 1 ; 设置不当可能会使脚本直接退出, 1 为循环首索引
-    , configsDefaultJson := "[""configs"",""applications"",""urls""]"
     , fileContents := {}
     , manifest := []
-    , password := ""
+
+    , password := A_Args[1]
+    , lastReloadTime := A_Args[2]
+
     , isWorking := False
 
-ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
+ReadConfigsToScript(password, fileContents, manifest, lastReloadTime)
 
 For index, value in manifest
 {
@@ -109,7 +111,7 @@ SaveCurrent:
 
     isWorking := False
     MsgBox, 已保存: %path%
-    Run, %A_AhkPath% %A_ScriptDir%\Main.ahk %password%
+    RunAhk(A_ScriptDir . "\Main.ahk", password . " " . lastReloadTime)
 Return
 
 ChangePW:
