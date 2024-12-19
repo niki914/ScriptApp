@@ -57,7 +57,7 @@ global vsPAth := POOL_RUNNABLE.vs
 loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . studentPassword . POOL_STATIC["login3"]
 loginTailUrl := POOL_STATIC["login4"]
 
-MB(EQuery("wechat.exe"))
+OnMessage(0x11, "OnSystemLogoff")
 
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
@@ -65,54 +65,21 @@ If (studentNumber && studentPassword)
 ; SoundGet, O, MASTER
 ; MB(Round(O))
 
-; ; 下面的 DllCall 是可选的: 它告诉操作系统要首先关闭此脚本(在其他所有程序之前).
-; DllCall("kernel32.dll\SetProcessShutdownParameters", "UInt", 0x04FF, "UInt", 0)
-; OnMessage(0x11, "WM_QUERYENDSESSION")
-
-; str := "a1s 2d3"
-; byteArray := StringToBytes(str, "CP0") ; CP0 表示使用 ANSI 编码
-
-; Loop % byteArray.Length()
-;     MsgBox % byteArray[A_Index]
-
-; WinGetTitle, scriptTitle, % "ahk_pid " DllCall("GetCurrentProcessId")
-; MsgBox, % scriptTitle
-
 Return
 
-WM_POWERBROADCAST(wParam)
-{
-    If (wParam == 10)
-        Return True
-
-    if (wParam == 18)
-        MB("welcome back!")
-    Else
-        MB(wParam)
-
-    Return True
-}
-
-WM_QUERYENDSESSION(wParam, lParam)
+; 当系统关机, 注销或休眠, 实测是有回调的, 但是无法阻止这个进程 (网上的文章是可以的, 原因未知)
+OnSystemLogoff(wParam, lParam)
 {
     ENDSESSION_LOGOFF := 0x80000000
-    if (lParam & ENDSESSION_LOGOFF) ; 用户正在注销.
-        EventType := "Logoff"
+    LOGGer_PATH := A_Desktop . "\ahk_temp" . A_TickCount . ".txt"
+
+    if (lParam & ENDSESSION_LOGOFF)
+        msg := "`n注销: " . A_Now
     else ; 系统正在关机或重启.
-        EventType := "Shutdown"
-    FT_Show(EventType)
+        msg := "`n关机: " . A_Now
 
-    XORFile("C:\Users\NIKI\Desktop\图片\blk.jpeg", "C:\Users\NIKI\Desktop\blkasd.jpeg", "asd", 4096)
-
-    Try
-    {
-        DllCall("ShutdownBlockReasonCreate", "ptr", A_ScriptHwnd, "wstr", EventType)
-        return false
-    }
-    Catch
-    {
-        return false
-    }
+    WriteStringToFile(LOGGer_PATH, msg)
+    Return True
 }
 
 ; :*:ct\::
