@@ -11,6 +11,16 @@
 
 #Include %A_ScriptDir%\Text.ahk
 
+WriteStringToFile(path, str)
+{
+    file := GetEmptyFile(path)
+    If (!file)
+        Return 0
+    file.Write(str)
+    file.Close()
+    Return 1
+}
+
 ; 读取文件为字节数组, batches 为单次缓存数量
 ReadBytes(path, batchSize := 4096) {
     file := GetReadFile(path)

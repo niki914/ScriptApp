@@ -22,6 +22,7 @@
 
 #Include %A_ScriptDir%\FileTools.ahk
 #Include %A_ScriptDir%\Message.ahk
+#Include %A_ScriptDir%\Everything.ahk
 #Include %A_ScriptDir%\Libs\JSON.ahk
 
 global POOL_RUNNABLE := {}

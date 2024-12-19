@@ -18,6 +18,7 @@ SetMouseDelay, -1
 SetDefaultMouseSpeed, 0
 SetWinDelay, -1
 SetControlDelay, -1
+Thread, Interrupt, 0
 ; 加快脚本运行速度的设置
 
 RunThisAsAdmin()
@@ -27,6 +28,7 @@ global fileContents := {}
     , password := A_Args[1]
 
     , lastReloadTime := A_Args[2]
+    , EVERYTHING_ID := 0x666
 
 ReadConfigsToScript(password, fileContents, manifest, lastReloadTime)
 
@@ -55,6 +57,8 @@ global vsPAth := POOL_RUNNABLE.vs
 loginHeadUrl := POOL_STATIC["login1"] . studentNumber . POOL_STATIC["login2"] . studentPassword . POOL_STATIC["login3"]
 loginTailUrl := POOL_STATIC["login4"]
 
+MB(EQuery("wechat.exe"))
+
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
 
@@ -64,26 +68,17 @@ If (studentNumber && studentPassword)
 ; ; 下面的 DllCall 是可选的: 它告诉操作系统要首先关闭此脚本(在其他所有程序之前).
 ; DllCall("kernel32.dll\SetProcessShutdownParameters", "UInt", 0x04FF, "UInt", 0)
 ; OnMessage(0x11, "WM_QUERYENDSESSION")
-; OnMessage(0x218, "WM_POWERBROADCAST")
 
-; AutoHotkey 脚本
-
-; 定义字符串
 ; str := "a1s 2d3"
-
 ; byteArray := StringToBytes(str, "CP0") ; CP0 表示使用 ANSI 编码
 
 ; Loop % byteArray.Length()
-; {
 ;     MsgBox % byteArray[A_Index]
-; }
 
 ; WinGetTitle, scriptTitle, % "ahk_pid " DllCall("GetCurrentProcessId")
 ; MsgBox, % scriptTitle
 
-; Clipboard := GetFileSize("D:\movie\你的名字.mp4")
-
-return
+Return
 
 WM_POWERBROADCAST(wParam)
 {

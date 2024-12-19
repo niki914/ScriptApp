@@ -6,6 +6,7 @@
 #Include %A_ScriptDir%\Net.ahk
 #Include %A_ScriptDir%\ConfigTools.ahk
 #Include %A_ScriptDir%\FileTools.ahk
+#Include %A_ScriptDir%\Everything.ahk
 
 ; global localhostPath := A_ScriptDir . "\base_url.txt"
 
