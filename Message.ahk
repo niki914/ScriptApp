@@ -43,7 +43,7 @@ FT_Dismiss()
 ; msgbox
 MB(message, title := "")
 {
-  MsgBox, 262144, %title% , %message%
+  MsgBox, 262144, %title%, %message%
 }
 
 ; tool tip
@@ -61,6 +61,8 @@ TT_Dismiss(pid := 1)
 ST_Show(message, title := "", time := 0, width := 0, height := 0)
 {
   ST_Dismiss()
+  If (!message)
+    Return
 
   global width_ST := width > 0 ? width : width_ST_Defauult
     , height_ST := height > 0 ? height : height_ST_Default

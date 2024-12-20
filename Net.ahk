@@ -29,7 +29,6 @@ Bing(text, apiKey, from := "en", to := "zh-CN")
 }
 
 ; deepl api 翻译, 默认美式英语译简中
-
 DeepL(text, apiKey, from := "EN", to := "ZH-HANS")
 {
     StringUpper, from, from

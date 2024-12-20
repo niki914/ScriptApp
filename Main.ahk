@@ -1,7 +1,5 @@
 ﻿#Include %A_ScriptDir%\ALL.ahk
 
-; #Include Lao\Chrome\Chrome.ahk
-
 #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式
 
@@ -28,14 +26,8 @@ global fileContents := {}
     , password := A_Args[1]
 
     , lastReloadTime := A_Args[2]
-    , EVERYTHING_ID := 0x666
 
 ReadConfigsToScript(password, fileContents, manifest, lastReloadTime)
-
-; If (password && !IsOutOfDate(lastReloadTime, REQUIRE_PASSWORD_MAX)) ; 带密码启动
-;     ConfigsReload(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
-; Else
-;     ConfigsInit(GetConfigPath("configs"), configsDefaultJson, password, fileContents, manifest)
 
 adminType := A_IsAdmin ? "(admin)" : ""
 FT_Show("hello! " . A_UserName . " " . adminType, 1500)
@@ -70,15 +62,15 @@ Return
 ; 当系统关机, 注销或休眠, 实测是有回调的, 但是无法阻止这个进程 (网上的文章是可以的, 原因未知)
 OnSystemLogoff(wParam, lParam)
 {
-    ENDSESSION_LOGOFF := 0x80000000
-    LOGGer_PATH := A_Desktop . "\ahk_temp" . A_TickCount . ".txt"
+    ; ENDSESSION_LOGOFF := 0x80000000
+    ; LOGGer_PATH := A_Desktop . "\ahk_temp" . A_TickCount . ".txt"
 
-    if (lParam & ENDSESSION_LOGOFF)
-        msg := "`n注销: " . A_Now
-    else ; 系统正在关机或重启.
-        msg := "`n关机: " . A_Now
+    ; if (lParam & ENDSESSION_LOGOFF)
+    ;     msg := "`n注销: " . A_Now
+    ; else ; 系统正在关机或重启.
+    ;     msg := "`n关机: " . A_Now
 
-    WriteStringToFile(LOGGer_PATH, msg)
+    ; WriteStringToFile(LOGGer_PATH, msg)
     Return True
 }
 
@@ -333,6 +325,12 @@ RunWithSplashText(path)
     Catch
     {
         ST_Show("✖", "", 800)
+        child := FindLastChild(path)
+        re := EQuery(child)
+        If (re)
+            MB("找到了: " . re)
+        Else
+            MB("在此计算机上找不到: " . path)
     }
 }
 

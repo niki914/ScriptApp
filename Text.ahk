@@ -9,6 +9,13 @@
 ; RunFolder(funcInstance, path := "")
 ; RunFuncForDirectory(path, funcInstance, ByRef result)
 
+; 查找路径字串的最后一个子项
+FindLastChild(path)
+{
+    s := Trim(path, " \/`n")
+    re := FilterText(s, "((?<=\\)[^\\]*$)")
+    Return re ? re : path
+}
 
 ; 字节数组转字符串, 默认 utf-8
 BytesToString(bytes, encoding := "UTF-8") {
@@ -68,7 +75,7 @@ IsTextIncluding(text, expect, caseSensitive := False)
 FilterText(text, pattern)
 {
     RegExMatch(text, pattern, result)
-    Return result1
+    Return result1 ? result1 : result.Value
 }
 
 ; 使用 windows api 反转一个字符串
