@@ -1,4 +1,6 @@
-﻿; ReadBytes(path, batchSize := 4096)
+﻿; WriteStringToFile(path, str)
+; AppendStringToFile(path, str)
+; ReadBytes(path, batchSize := 4096)
 ; WriteBytes(path, bytes, batches := 4096)
 ; AppendBytes(path, bytes, batchSize := 4096)
 ; CryptBytes(bytes, password)
@@ -8,6 +10,7 @@
 ; GetReadFile(path, create := False)
 ; GetFileSize(path)
 ; XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
+
 
 #Include %A_ScriptDir%\lib\text\Text.ahk
 global XOR_DLL_PATH := "lib\my_dll\XOR.dll\"

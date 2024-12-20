@@ -1,4 +1,9 @@
-﻿#Include %A_ScriptDir%\FileTools.ahk
+﻿; XORFile_Cypter(inFilePath, outFilePath, password)
+; SetProgress(v)
+; RunOnNewThread(command)
+
+
+#Include %A_ScriptDir%\FileTools.ahk
 #Include %A_ScriptDir%\lib\message\Message.ahk
 global XOR_DLL_PATH := A_ScriptDir . "\lib\my_dll\XOR.dll\"
 

@@ -1,5 +1,9 @@
-﻿; RunCmdWithExpect(command, expect, timeout := 0.5)
-; RunCmd(command, timeout := 0.5)
+﻿; RunCmdWithExpect(command, expect, timeout := 0.3)
+; RunCmd(command, timeout := 0.3)
+; RunThisAsAdmin()
+; WinShutDown()
+; WinSleep()
+
 
 #Include %A_ScriptDir%\lib\text\Text.ahk
 

@@ -1,24 +1,17 @@
-﻿#Include %A_ScriptDir%\FileTools.ahk
-
-#Include %A_ScriptDir%\lib\message\Message.ahk
-#Include %A_ScriptDir%\lib\everything\Everything.ahk
-#Include %A_ScriptDir%\lib\json\JSON.ahk
-
-global configFolder := A_ScriptDir . "\config\"
-    , configNameStr := "configs"
-    , hotstringStyle_H := "::"
-    , hotstringStyle_T := ""
-
-; IsParsable(v)
+﻿; IsParsable(v)
 ; IsUrl(str)
-; PraseObject(obj, parent := "")
+; InitPools(obj, parent := "")
 ; BuildRunnables()
 ; BuildHotStrings()
 ; BuildCodes()
 ; BuildHotstring(funcName, key, value)
-; ConfigsReload(cPath, cDefault, password, ByRef contents, ByRef manifest)
+; ConfigsReload(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
 ; ConfigsInit(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest)
+; _ConfigsBuild(cPath, cDefault, ByRef password, ByRef contents, ByRef manifest, withPassword)
 ; Guidance()
+; ReadConfigsToScript(ByRef pw_br, ByRef contents_br, ByRef manifest_br, ByRef lastSet_br)
+; IsOutOfDate(lastSet, maxSet)
+; RunAhk(dir, extra := "")
 ; RequirePassword(msg)
 ; ReadCryptedJsonString(path, password, default)
 ; ReadCyptedJSON(path, password, default)
@@ -30,6 +23,19 @@ global configFolder := A_ScriptDir . "\config\"
 ; AppendCryptFile(path, bytes, password)
 ; GetConfigPath(name)
 ; ReadConfigFiles(manifest, password, ByRef outObj, default)
+; CleanUnregistereds(manifest)
+
+
+#Include %A_ScriptDir%\FileTools.ahk
+
+#Include %A_ScriptDir%\lib\message\Message.ahk
+#Include %A_ScriptDir%\lib\everything\Everything.ahk
+#Include %A_ScriptDir%\lib\json\JSON.ahk
+
+global configFolder := A_ScriptDir . "\config\"
+    , configNameStr := "configs"
+    , hotstringStyle_H := "::"
+    , hotstringStyle_T := ""
 
 global POOL_RUNNABLE := {}
     , POOL_CODE := {}

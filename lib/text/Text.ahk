@@ -1,4 +1,5 @@
-﻿; BytesToString(bytes, encoding := "UTF-8")
+﻿; FindLastChild(path)
+; BytesToString(bytes, encoding := "UTF-8")
 ; IsCN(text)
 ; StringToBytes(str, encoding := "UTF-8")
 ; BytesToBstring(Body, Cset)

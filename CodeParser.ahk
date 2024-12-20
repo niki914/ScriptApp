@@ -1,9 +1,14 @@
-﻿#Include %A_ScriptDir%\lib\text\Text.ahk
-global kw_CodeParser := ["for", "if", "loop", "else", "else if", "while", "switch", "try", "catch", "when"]
-
-; GetFuncDescriptionInFile(filePath := "")
+﻿; GetFuncDescriptionInFile(filePath := "")
+; ReadFileDescriptionForFolder()
 ; FilterFuncName(str)
 ; IsArrIncluding(array, expect)
+
+
+#Include %A_ScriptDir%\lib\text\Text.ahk
+
+global kw_CodeParser := ["for", "if", "loop", "else", "else if", "while", "switch", "try", "catch", "when"]
+
+
 
 ; 识别函数定义的正则
 ; 必须加个括号在外面才能保存
@@ -42,15 +47,15 @@ GetFuncDescriptionInFile(filePath := "")
     newPos := RegExMatch(fileContent, pattern, match, pos)
     pos := newPos + StrLen(match1)
 
-    re := Trim(match1, "`n`r ")
-    
+    re := Trim(match1, "`n`t`r ")
+
     ; 筛选出为非内置关键字的函数
     ; 逻辑: 提取函数名字串, 转小写后与设定的关键字数组比对, 如果不是关键字并且不是空字串则拼接到字符串内
-    If (re && !IsArrIncluding(kw_CodeParser, FilterFuncName(re))) 
+    If (re && !IsArrIncluding(kw_CodeParser, FilterFuncName(re)))
       result .= re . "`n"
   } Until (oldPos = pos) ; 字串指针位置不再变化则终止
 
-  Return result
+  Return Trim(result, " `n`t`r")
 }
 
 ; 读取一个目录下的文本文件并提取函数定义
@@ -72,7 +77,7 @@ FilterFuncName(str)
 {
   pattern := "(\w*\s*(?=\())"
   filter := FilterText(str, pattern)
-  Return Trim(filter, "`n`r ")
+  Return Trim(filter, "`n`t`r ")
 }
 
 ; 检查数组中是否存在某元素

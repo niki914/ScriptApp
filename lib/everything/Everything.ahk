@@ -1,4 +1,20 @@
-﻿global E_FILE_NAME = 0x00000001 ; 仅名字
+﻿; EQuery(keywords)
+; SetMax(max)
+; SetOffset(offset)
+; SetRequestFlags(flags)
+; SetSearch(keywords)
+; Query(await := True)
+; IsReply(msg, w, l, id)
+; GetFullPathsToArr(ByRef arr)
+; GetFullPath(index := 0)
+; GetExtension(index := 0)
+; GetLastError(tell := True)
+; __New()
+; __Delete()
+; _LoadDll()
+; _FreeDll()
+
+global E_FILE_NAME = 0x00000001 ; 仅名字
     , E_PATH = 0x00000002 ; 仅路径
     , E_FULL_PATH_AND_FILE_NAME = 0x00000004 ; 完整路径
     , E_EXTENSION = 0x00000008 ; 拓展名

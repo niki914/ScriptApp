@@ -22,7 +22,6 @@ SetControlDelay, -1
 Thread, Interrupt, 0
 ; 加快脚本运行速度的设置
 
-
 RunThisAsAdmin()
 
 global fileContents := {}
@@ -122,10 +121,9 @@ Return
     SendInput % GetIP()
 Return
 
-::``12::
-::21``::
+:*:``12::
+:*:21``::
     RunAhk(A_ScriptFullPath, password . " " . lastReloadTime)
-; Run, %A_AhkPath% %A_ScriptFullPath% %password%
 Return
 ; 通过 powershell 脚本启动热点
 ::hs::
@@ -215,6 +213,26 @@ Return
         SendInput, Build APK(s)
     Return
 #IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; OnSystemLogoff(wParam, lParam)
+; GetSelectedText()
+; WaitForKey()
+; Translate(bingKey := "", deeplKey := "")
+; RunUrl(title, url)
+; SendString(str)
+; RunWithSplashText(path)
+; RunWaitString(command)
+; RunLocalHost(url)
+; RunPenetration(port := "3000")
 
 ; 通过剪贴板获取鼠标选取的文本
 GetSelectedText()
