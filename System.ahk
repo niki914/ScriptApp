@@ -1,7 +1,7 @@
 ﻿; RunCmdWithExpect(command, expect, timeout := 0.5)
 ; RunCmd(command, timeout := 0.5)
 
-#Include %A_ScriptDir%\Text.ahk
+#Include %A_ScriptDir%\lib\text\Text.ahk
 
 RunCmdWithExpect(command, expect, timeout := 0.3)
 {

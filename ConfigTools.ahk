@@ -1,4 +1,15 @@
-﻿; IsParsable(v)
+﻿#Include %A_ScriptDir%\FileTools.ahk
+
+#Include %A_ScriptDir%\lib\message\Message.ahk
+#Include %A_ScriptDir%\lib\everything\Everything.ahk
+#Include %A_ScriptDir%\lib\json\JSON.ahk
+
+global configFolder := A_ScriptDir . "\config\"
+    , configNameStr := "configs"
+    , hotstringStyle_H := "::"
+    , hotstringStyle_T := ""
+
+; IsParsable(v)
 ; IsUrl(str)
 ; PraseObject(obj, parent := "")
 ; BuildRunnables()
@@ -20,21 +31,13 @@
 ; GetConfigPath(name)
 ; ReadConfigFiles(manifest, password, ByRef outObj, default)
 
-#Include %A_ScriptDir%\FileTools.ahk
-#Include %A_ScriptDir%\Message.ahk
-#Include %A_ScriptDir%\Everything.ahk
-#Include %A_ScriptDir%\Libs\JSON.ahk
-
 global POOL_RUNNABLE := {}
     , POOL_CODE := {}
     , POOL_STATIC := {}
     , POOL_HOTSTRING := {}
 
-    , configFolder := A_ScriptDir . "\Config\"
     , configsDefaultJson := "[""configs"",""You can write anything as a new config file!""]"
     , REQUIRE_PASSWORD_MAX := 7 * 24 * 60 * 60 * 1000 ; 7 days
-
-    , configNameStr := "configs"
 
 IsParsable(v)
 {
@@ -112,7 +115,7 @@ BuildCodes()
 
 BuildHotstring(funcName, key, value)
 {
-    hotstring := ":*:" . key . "\"
+    hotstring := hotstringStyle_H . key . hotstringStyle_T
     Hotstring(hotstring, Func(funcName).Bind(value))
 }
 

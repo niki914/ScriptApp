@@ -9,7 +9,8 @@
 ; GetFileSize(path)
 ; XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
 
-#Include %A_ScriptDir%\Text.ahk
+#Include %A_ScriptDir%\lib\text\Text.ahk
+global XOR_DLL_PATH := "lib\my_dll\XOR.dll\"
 
 WriteStringToFile(path, str)
 {
@@ -203,7 +204,19 @@ GetFileSize(path)
 
 XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
 {
-    return DllCall("Libs\XOR.dll\XORFile", "Str", inFilePath, "Str", outFilePath, "Str", password, "Int", bufferSize)
+    return DllCall(XOR_DLL_PATH . "XORFile"
+    , "Str", inFilePath
+    , "Str", outFilePath
+    , "Str", password
+    , "Int", bufferSize)
+
+    ; r := DllCall("%XOR_DLL_PATH%XORFile"
+    ; , "Str", %inFilePath%
+    ; , "Str", %outFilePath%
+    ; , "Str", %password%
+    ; , "Int", %BufferSize_Crypter%
+    ; , "int64", %size%
+    ; , "Str", %Hwnd_Cryper%)
 }
 
 ; ; 异或加密一个文件到指定路径, 默认缓存大小为 10M

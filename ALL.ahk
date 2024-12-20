@@ -1,14 +1,14 @@
-﻿#Include %A_ScriptDir%\Message.ahk
-#Include %A_ScriptDir%\CodeParser.ahk
-#Include %A_ScriptDir%\Text.ahk
-#Include %A_ScriptDir%\System.ahk
-#Include %A_ScriptDir%\GDUT.ahk
-#Include %A_ScriptDir%\Net.ahk
-#Include %A_ScriptDir%\ConfigTools.ahk
-#Include %A_ScriptDir%\FileTools.ahk
-#Include %A_ScriptDir%\Everything.ahk
+﻿#Include *i %A_ScriptDir%\CodeParser.ahk
+#Include *i %A_ScriptDir%\System.ahk
+#Include *i %A_ScriptDir%\GDUT.ahk
+#Include *i %A_ScriptDir%\Net.ahk
+#Include *i %A_ScriptDir%\ConfigTools.ahk
+#Include *i %A_ScriptDir%\FileTools.ahk
 
-; global localhostPath := A_ScriptDir . "\base_url.txt"
+#Include *i %A_ScriptDir%\lib\everything\Everything.ahk
+
+#Include *i %A_ScriptDir%\lib\message\Message.ahk
+#Include *i %A_ScriptDir%\lib\text\Text.ahk
 
 ; Chrome_Run(url)
 ; {

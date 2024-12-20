@@ -1,5 +1,6 @@
 ﻿#Include %A_ScriptDir%\FileTools.ahk
-#Include %A_ScriptDir%\Message.ahk
+#Include %A_ScriptDir%\lib\message\Message.ahk
+global XOR_DLL_PATH := A_ScriptDir . "\lib\my_dll\XOR.dll\"
 
 #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式
@@ -116,12 +117,25 @@ XORFile_Cypter(inFilePath, outFilePath, password)
     If (inFilePath == outFilePath)
         Return "设置了相同的路径, 这是一个不安全的操作"
     size := GetFileSize(inFilePath)
-    order := "r := DllCall(""Libs\XOR.dll\XORFile"", ""Str"",""" . inFilePath
-        . """, ""Str"",""" . outFilePath
-        . """, ""Str"",""" . password
-        . """, ""Int""," . BufferSize_Crypter
-        . ", ""int64""," . size
-        . ", ""Str"",""" . Hwnd_Cryper . """)`nMsgBox, 262144, XOR , %r%"
+
+    order := "
+    (
+        r := DllCall(""" XOR_DLL_PATH "XORFile""
+        , ""Str"", """ inFilePath """
+        , ""Str"", """ outFilePath """
+        , ""Str"", """ password """
+        , ""Int"", " BufferSize_Crypter "
+        , ""int64"", " size "
+        , ""Str"", """ Hwnd_Cryper """)
+        MsgBox, 262144, XOR , %r%
+    )"
+
+    ; order := "r := DllCall(""" . XOR_DLL_PATH . "XORFile"", ""Str"",""" . inFilePath
+    ;     . """, ""Str"",""" . outFilePath
+    ;     . """, ""Str"",""" . password
+    ;     . """, ""Int""," . BufferSize_Crypter
+    ;     . ", ""int64""," . size
+    ;     . ", ""Str"",""" . Hwnd_Cryper . """)`nMsgBox, 262144, XOR , %r%"
     RunOnNewThread(order)
 }
 
@@ -130,65 +144,83 @@ SetProgress(v)
     GuiControl,, ProgressBar, %v%
 }
 
-XORFileTelling1(inFilePath, outFilePath, password)
-{
-    bufferSize := 2048
-    tick := A_TickCount
+; XORFileTelling1(inFilePath, outFilePath, password)
+; {
+;     bufferSize := 2048
+;     tick := A_TickCount
 
-    If (inFilePath == outFilePath)
-        Return "设置了相同的路径, 这是一个不安全的操作"
-    If (GetType(bufferSize) != "number" || bufferSize <= 0)
-        Return "缓存大小设置有误: " . bufferSize
-    If (!FileExist(inFilePath))
-        Return "原文件不存在"
+;     If (inFilePath == outFilePath)
+;         Return "设置了相同的路径, 这是一个不安全的操作"
+;     If (GetType(bufferSize) != "number" || bufferSize <= 0)
+;         Return "缓存大小设置有误: " . bufferSize
+;     If (!FileExist(inFilePath))
+;         Return "原文件不存在"
 
-    fileIn := FileOpen(inFilePath, "r")
-    fileOut := GetEmptyFile(outFilePath)
+;     fileIn := FileOpen(inFilePath, "r")
+;     fileOut := GetEmptyFile(outFilePath)
 
-    if(!fileIn || !fileOut)
-    {
-        if (fileIn)
-            fileIn.Close()
-        if (fileOut)
-            fileOut.Close()
-        Return "文件获取失败"
-    }
+;     if(!fileIn || !fileOut)
+;     {
+;         if (fileIn)
+;             fileIn.Close()
+;         if (fileOut)
+;             fileOut.Close()
+;         Return "文件获取失败"
+;     }
 
-    VarSetCapacity(buffer, bufferSize)
+;     VarSetCapacity(buffer, bufferSize)
 
-    pwBytes := StrSplit(password)
-    pwLength := StrLen(password)
+;     pwBytes := StrSplit(password)
+;     pwLength := StrLen(password)
 
-    fileSize := fileIn.Length
-    processedBytes := 0
+;     fileSize := fileIn.Length
+;     processedBytes := 0
 
-    ; 读取、加密并写入
-    while (bytesRead := fileIn.RawRead(&buffer, bufferSize))
-    {
-        Loop % bytesRead ; 对每个字节进行异或操作
-        {
-            pwIndex := Mod(A_Index - 1, pwLength) + 1
-            dataByte := NumGet(buffer, A_Index - 1, "UChar")
-            pwByte := Asc(pwBytes[pwIndex])
-            encryptedByte := dataByte ^ pwByte
-            NumPut(encryptedByte, buffer, A_Index - 1, "UChar")
-        }
+;     ; 读取、加密并写入
+;     while (bytesRead := fileIn.RawRead(&buffer, bufferSize))
+;     {
+;         Loop % bytesRead ; 对每个字节进行异或操作
+;         {
+;             pwIndex := Mod(A_Index - 1, pwLength) + 1
+;             dataByte := NumGet(buffer, A_Index - 1, "UChar")
+;             pwByte := Asc(pwBytes[pwIndex])
+;             encryptedByte := dataByte ^ pwByte
+;             NumPut(encryptedByte, buffer, A_Index - 1, "UChar")
+;         }
 
-        fileOut.RawWrite(&buffer, bytesRead)
-        processedBytes += bytesRead
-        progress := Round((processedBytes / fileSize) * 100)
-        GuiControl,, ProgressBar, %progress%
-    }
+;         fileOut.RawWrite(&buffer, bytesRead)
+;         processedBytes += bytesRead
+;         progress := Round((processedBytes / fileSize) * 100)
+;         GuiControl,, ProgressBar, %progress%
+;     }
 
-    fileIn.Close()
-    fileOut.Close()
-    GuiControl,, ProgressBar, 100
-    Return (A_TickCount - tick)
-}
+;     fileIn.Close()
+;     fileOut.Close()
+;     GuiControl,, ProgressBar, 100
+;     Return (A_TickCount - tick)
+; }
 
 RunOnNewThread(command)
 {
-    head := "#NoTrayIcon`n#SingleInstance force`n#NoEnv`n#MaxHotkeysPerInterval 99000000`n#HotkeyInterval 99000000`n#KeyHistory 0`nListLines Off`nProcess, Priority, , A`nSetBatchLines, -1`nSetKeyDelay, -1, -1`nSetMouseDelay, -1`nSetDefaultMouseSpeed, 0`nSetWinDelay, -1`nSetControlDelay, -1`nSendMode Input`n"
+    head := "
+    (
+        #NoTrayIcon
+        #SingleInstance force
+        #NoEnv
+        #MaxHotkeysPerInterval 99000000
+        #HotkeyInterval 99000000
+        #KeyHistory 0
+        ListLines Off
+        Process, Priority, , A
+        SetBatchLines, -1
+        SetKeyDelay, -1, -1
+        SetMouseDelay, -1
+        SetDefaultMouseSpeed, 0
+        SetWinDelay, -1
+        SetControlDelay, -1
+        SendMode Input
+    )"
+    command := "`n" . command
     tail := "`nExitApp"
     order := head . command . tail
     tempFile := A_ScriptDir . "\~tmp_" . A_TickCount . ".ahk"

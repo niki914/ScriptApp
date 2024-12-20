@@ -1,4 +1,5 @@
 ﻿#Include %A_ScriptDir%\ConfigTools.ahk
+global mainAhkPath := A_ScriptDir . "\Main.ahk"
 
 #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式
@@ -111,7 +112,7 @@ SaveCurrent:
 
     isWorking := False
     MsgBox, 已保存: %path%
-    RunAhk(A_ScriptDir . "\Main.ahk", password . " " . lastReloadTime)
+    RunAhk(mainAhkPath, password . " " . lastReloadTime)
 Return
 
 ChangePW:

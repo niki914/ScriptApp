@@ -1,4 +1,7 @@
 ﻿#Include %A_ScriptDir%\ALL.ahk
+global EditorPath := A_ScriptDir . "\ConfigEditor.ahk"
+
+#Hotstring EndChars \
 
 #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式
@@ -18,6 +21,7 @@ SetWinDelay, -1
 SetControlDelay, -1
 Thread, Interrupt, 0
 ; 加快脚本运行速度的设置
+
 
 RunThisAsAdmin()
 
@@ -74,73 +78,72 @@ OnSystemLogoff(wParam, lParam)
     Return True
 }
 
-; :*:ct\::
+; ::ct::
 ;     Action_LoaclTunnel()
 ; Return
 
-; :*:shut\::
+; ::shut::
 ;     WinShutDown()
 ; Return
 
-:*:lh\::
+::lh::
     RunPenetration("1234")
 Return
 
-:*:sl\::
+::sl::
     WinSleep()
 Return
 
-:*:cy\::
+::cy::
     Run, %A_ScriptDir%\Crypter.ahk
 Return
 
-:*:ed\::
-    RunAhk(A_ScriptDir . "\ConfigEditor.ahk", password . " " . lastReloadTime)
+::ed::
+    RunAhk(EditorPath, password . " " . lastReloadTime)
 Return
 
-:*:ex\::
+::ex::
 ExitApp
 
-:*:rd\::
+::rd::
     t := GetFuncDescriptionInFile()
     If (t)
         Clipboard := t
 Return
 
-:*:read\::
+::read::
     t := ReadFileDescriptionForFolder()
     If (t)
         Clipboard := t
 Return
 
 ; 快速输出 ip
-:*:ip\::
+::ip::
     SendInput % GetIP()
 Return
 
-:*:``12::
-:*:21``::
+::``12::
+::21``::
     RunAhk(A_ScriptFullPath, password . " " . lastReloadTime)
 ; Run, %A_AhkPath% %A_ScriptFullPath% %password%
 Return
-
 ; 通过 powershell 脚本启动热点
-:*:hs\::
+::hs::
     ; 需要设置权限才能运行脚本, 运行结束后还原权限设置
     ; Set-ExecutionPolicy Unrestricted
     ; Set-ExecutionPolicy Restricted
     RunCmd("powershell.exe -Command Set-ExecutionPolicy Unrestricted")
-    ST_Show(RunCmd("powershell.exe -Command D:; cd " . A_ScriptDir . "; .\hotspot.ps1"), "", 1500)
+    ST_Show(RunCmd("powershell.exe -Command D:; cd " . A_ScriptDir . "\lib\my_shell" . "; .\hotspot.ps1", 2), "", 1000)
     RunCmd("powershell.exe -Command Set-ExecutionPolicy Restricted")
 Return
 
 ; 断 wifi
-:*:dc\::
+::dc::
     DisconnectWifi()
 Return
 
 ; 连校园网
-:*:lk\::
+::lk::
     ST_Show(GDUT(), "gdut", 800)
 Return
 
@@ -188,7 +191,7 @@ Return
 Return
 
 ^`:: ; 编辑 Main.ahk
-    If (!FileExist(vsPAth))
+    If (!FileExist(vsPAth) || !FileExist(A_ScriptDir))
         Return
     Run %vsPAth% %A_ScriptDir%
 Return
@@ -208,7 +211,7 @@ Return
     !+f::
         Send ^!l
     return
-    :*:bd\::
+    ::bd::
         SendInput, Build APK(s)
     Return
 #IfWinActive
@@ -336,9 +339,26 @@ RunWithSplashText(path)
 
 RunWaitString(command)
 {
-    head := "#NoTrayIcon`n#SingleInstance force`n#NoEnv`n#MaxHotkeysPerInterval 99000000`n#HotkeyInterval 99000000`n#KeyHistory 0`nListLines Off`nProcess, Priority, , A`nSetBatchLines, -1`nSetKeyDelay, -1, -1`nSetMouseDelay, -1`nSetDefaultMouseSpeed, 0`nSetWinDelay, -1`nSetControlDelay, -1`nSendMode Input`n"
+    head :="
+    (
+        #NoTrayIcon
+        #SingleInstance force
+        #NoEnv
+        #MaxHotkeysPerInterval 99000000
+        #HotkeyInterval 99000000
+        #KeyHistory 0
+        ListLines Off
+        Process, Priority, , A
+        SetBatchLines, -1
+        SetKeyDelay, -1, -1
+        SetMouseDelay, -1
+        SetDefaultMouseSpeed, 0
+        SetWinDelay, -1
+        SetControlDelay, -1
+        SendMode Input
+    )"
     tail := "`nExitApp"
-    order := head . command . tail
+    order := head . "`n" . command . tail
     tempFile := A_ScriptDir . "\~tmp_" . A_TickCount . ".ahk"
     FileDelete %tempFile% ; 删除旧的临时文件(如果存在)
     FileAppend, %order%, %tempFile% ; 将代码写入临时文件
@@ -432,34 +452,34 @@ RunPenetration(port := "3000")
 
 ; ; 以下为弃用热字符串(已集成至 json 配置文件内)
 
-; :*:wlan\::
+; ::wlan::
 ;     Run % ComSpec " /c ncpa.cpl", , Hide
 ; Return
 
 ; ; 快速启动网易云 localhost
-; :*:wyy\::
+; ::wyy::
 ;     Run %ComSpec% /c npx NeteaseCloudMusicApi, , Minimize
 ; Return
 
 ; ; 脚本目录
-; :*:app\::
+; ::app::
 ;     Run % A_ScriptDir
 ; Return
 
-; :*:ex\::
+; ::ex::
 ; ExitApp
 
 ; 本机高级系统属性
-; :*:se\::
+; ::se::
 ;     Run sysdm.cpl
 ; Return
 
 ; ; 重启资源管理器
-; :*:rf\::
+; ::rf::
 ;     RunWait %ComSpec% /c taskkill /f /im explorer.exe & start explorer.exe, , Hide
 ; Return
 
 ; ; 使本机睡眠
-; :*:sl\::
+; ::sl::
 ;     DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
 ; Return

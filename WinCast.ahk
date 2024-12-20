@@ -1,4 +1,4 @@
-﻿#Include %A_ScriptDir%\Message.ahk
+﻿#Include %A_ScriptDir%\lib\message\Message.ahk
 
 #Persistent
 #SingleInstance force ; 单例模式

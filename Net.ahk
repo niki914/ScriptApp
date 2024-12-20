@@ -10,8 +10,8 @@
 ; DisconnectWifi()
 
 #Include %A_ScriptDir%\System.ahk
-#Include %A_ScriptDir%\Text.ahk
-#Include %A_ScriptDir%\Libs\JSON.ahk
+#Include %A_ScriptDir%\lib\text\Text.ahk
+#Include %A_ScriptDir%\lib\json\JSON.ahk
 
 ; bing api 翻译, 默认美式英语译简中
 Bing(text, apiKey, from := "en", to := "zh-CN")

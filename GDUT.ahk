@@ -5,7 +5,7 @@
 ; GDUT_Login()
 
 #Include %A_ScriptDir%\Net.ahk
-#Include %A_ScriptDir%\Message.ahk
+#Include %A_ScriptDir%\lib\message\Message.ahk
 
 global ssid_GDUT := "gdut"
     , retryCount_GDUT := 5

@@ -30,7 +30,7 @@ global E_maxLen := 256
     , E_defaultFlags := (E_EXTENSION | E_FULL_PATH_AND_FILE_NAME)
 
     ; 以下的完整路径设置是必要的
-    , E_pth := A_ScriptDir . "\Libs\Everything" . (A_Is64bitOS ? "64.dll" : "32.dll")
+    , E_pth := "Everything" . (A_Is64bitOS ? "64.dll" : "32.dll")
     , E_func := E_pth . "\Everything_"
 
 ; 调用 everything dll 搜索关键字并返回收个路径
