@@ -11,7 +11,6 @@
 ; GetFileSize(path)
 ; XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
 
-
 #Include %A_ScriptDir%\lib\text\Text.ahk
 global XOR_DLL_PATH := "lib\my_dll\XOR.dll\"
 
@@ -144,6 +143,7 @@ CryptBytes(bytes, password) {
 }
 
 ; 获取变量的类型
+; 返回值为 'array', 'object', 'string' 等等
 GetType(v) {
     If (IsObject(v))
     {
@@ -208,10 +208,10 @@ GetFileSize(path)
 XORFile(inFilePath, outFilePath, password, bufferSize := 4096)
 {
     return DllCall(XOR_DLL_PATH . "XORFile"
-    , "Str", inFilePath
-    , "Str", outFilePath
-    , "Str", password
-    , "Int", bufferSize)
+        , "Str", inFilePath
+        , "Str", outFilePath
+        , "Str", password
+        , "Int", bufferSize)
 
     ; r := DllCall("%XOR_DLL_PATH%XORFile"
     ; , "Str", %inFilePath%

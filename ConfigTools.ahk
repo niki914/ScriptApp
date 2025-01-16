@@ -25,7 +25,6 @@
 ; ReadConfigFiles(manifest, password, ByRef outObj, default)
 ; CleanUnregistereds(manifest)
 
-
 #Include %A_ScriptDir%\FileTools.ahk
 
 #Include %A_ScriptDir%\lib\message\Message.ahk
@@ -223,6 +222,8 @@ IsOutOfDate(lastSet, maxSet)
 
     rest := A_TickCount - lastSet
 
+    If (maxSet < 0)
+        Return False
     Return rest >= maxSet
 }
 

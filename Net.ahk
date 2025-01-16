@@ -68,10 +68,10 @@ DeepL(text, apiKey, from := "EN", to := "ZH-HANS")
 Ping(url, timeout := 5)
 {
     obj := GetRequest(url, timeout)
-    If (obj.code != "")
-        Return obj.code != -1
+    If (obj.code > 0 && obj.code != "")
+        Return obj.code
     Else
-        Return False
+        Return 0
 }
 
 ; 超时参数为秒数

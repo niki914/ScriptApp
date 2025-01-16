@@ -28,7 +28,8 @@ global fileContents := {}
     , manifest := []
     , password := A_Args[1]
 
-    , lastReloadTime := A_Args[2]
+    ; , lastReloadTime := A_Args[2]
+    , lastReloadTime := A_TickCount ; 不启用密码过期功能
 
 ReadConfigsToScript(password, fileContents, manifest, lastReloadTime)
 
@@ -60,6 +61,8 @@ If (studentNumber && studentPassword)
 ; SoundGet, O, MASTER
 ; MB(Round(O))
 
+a := GetCurrentWifi()
+
 Return
 
 ; 当系统关机, 注销或休眠, 实测是有回调的, 但是无法阻止这个进程 (网上的文章是可以的, 原因未知)
@@ -85,6 +88,32 @@ OnSystemLogoff(wParam, lParam)
 ;     WinShutDown()
 ; Return
 
+::adb::
+    ip := IB("输入安卓手机的ip", "adb")
+    If (ip)
+    {
+        adbResult := RunCmd("adb connect " + ip, 5)
+        ST_Show(adbResult, "", 1000)
+    }
+
+Return
+
+::pg::
+    ST_Show(Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 3), "PING", 800)
+Return
+
+::usb::
+    RunWithSplashText("F:\")
+Return
+
+::md::
+    name := IB("为 Markdown 文件命名:")
+    If (name == "")
+        Return
+    mdPath := A_Desktop . "\" . name . ".md"
+    GetEmptyFile(mdPath).Close()
+    RunWithSplashText(mdPath)
+Return
 ::lh::
     RunPenetration("1234")
 Return

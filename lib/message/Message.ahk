@@ -46,6 +46,18 @@ MB(message, title := "")
   MsgBox, 262144, %title%, %message%
 }
 
+; 要求输入密码
+IB(message, title := "", hide := False)
+{
+  If (hide)
+    InputBox, str, %title% , %message%, Hide
+  Else
+    InputBox, str, %title% , %message%
+  ; if ErrorLevel ; 用户按下取消或关闭窗口
+  ; Return ""
+  Return str
+}
+
 ; tool tip
 TT_Show(message, pid := 1, x := "", y := "")
 {

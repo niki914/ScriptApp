@@ -11,21 +11,24 @@ global ssid_GDUT := "gdut"
     , retryCount_GDUT := 5
     , loginHeadUrl := ""
     , loginTailUrl := ""
-    , isWorking_GDUT := False
+    , isDone_GDUT := True
 
 ; 在连接了校园网并且网络不可用的时候自动登录
 GDUT_KeepAlive()
 {
-    SetTimer, Tag_GDUT, 5000
+    Gosub, Tag_GDUT
+    SetTimer, Tag_GDUT, 10000
     Return
 
     Tag_GDUT:
-    If (isWorking_GDUT)
+    If (!isDone_GDUT)
         Return
-    isWorking_GDUT := True
-    If (!Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 2) && GetCurrentWifi() == "gdut")
-        ST_Show(GDUT_Login(), "gdut", 800)
-    isWorking_GDUT := False
+    isDone_GDUT := False
+    pingCode_GDUT := Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 3)
+
+    If (pingCode_GDUT == 0 && GetCurrentWifi() == "gdut")
+        GDUT_Login()
+    isDone_GDUT := True
     Return
 }
 
@@ -40,6 +43,7 @@ GDUT()
     {
         If(GDUT_Connect())
             Return GDUT_Login()
+        Sleep, 200
     }
     Return "gdut wifi was not connected"
 }
@@ -50,8 +54,11 @@ GDUT_Connect()
     If (!IsWifiNear(ssid_GDUT))
         Return False
     Loop % retryCount_GDUT
+    {
         If (IsWifiConnected(ssid_GDUT))
             Return True
+        Sleep, 200
+    }
     Return False ; 尝试无果
 }
 

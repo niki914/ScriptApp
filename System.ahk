@@ -1,13 +1,12 @@
-﻿; RunCmdWithExpect(command, expect, timeout := 0.3)
-; RunCmd(command, timeout := 0.3)
+﻿; RunCmdWithExpect(command, expect, timeout := 0.25)
+; RunCmd(command, timeout := 0.25)
 ; RunThisAsAdmin()
 ; WinShutDown()
 ; WinSleep()
 
-
 #Include %A_ScriptDir%\lib\text\Text.ahk
 
-RunCmdWithExpect(command, expect, timeout := 0.3)
+RunCmdWithExpect(command, expect, timeout := 0.25)
 {
     Return IsTextIncluding(RunCmd(command, timeout), expect)
 }
@@ -15,10 +14,14 @@ RunCmdWithExpect(command, expect, timeout := 0.3)
 ; 运行 cmd 命令并返回运行结果
 ; 注意, 耗时的 cmd 指令可能会导致延迟返回等奇怪问题
 ; 会影响剪贴板的使用
-RunCmd(command, timeout := 0.3)
+global isRunning_System := False
+RunCmd(command, timeout := 0.25)
 {
     If (!command)
         Return ""
+    While (isRunning_System)
+        Sleep, 1
+    isRunning_System := True
 
     ClipSaved := ClipboardAll ; 把剪贴板的所有内容 (任何格式)
 
@@ -29,6 +32,7 @@ RunCmd(command, timeout := 0.3)
 
     result := Clipboard
     Clipboard := ClipSaved ; 使用 Clipboard (不是 ClipboardAll)
+    isRunning_System := False
     Return result
 }
 
