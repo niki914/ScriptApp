@@ -46,7 +46,7 @@ MB(message, title := "")
   MsgBox, 262144, %title%, %message%
 }
 
-; 要求输入密码
+; 要求输入
 IB(message, title := "", hide := False)
 {
   If (hide)

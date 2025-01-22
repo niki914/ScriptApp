@@ -3,7 +3,7 @@ global EditorPath := A_ScriptDir . "\ConfigEditor.ahk"
 
 #Hotstring EndChars \
 
-#NoTrayIcon ; 不显示小图标
+; #NoTrayIcon ; 不显示小图标
 #SingleInstance force ; 单例模式
 
 ; 加快脚本运行速度的设置
@@ -57,11 +57,6 @@ OnMessage(0x11, "OnSystemLogoff")
 
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
-
-; SoundGet, O, MASTER
-; MB(Round(O))
-
-a := GetCurrentWifi()
 
 Return
 
@@ -176,6 +171,41 @@ Return
 
 ;----以下是快捷键----
 
+!d::
+    ClipSaved := ClipboardAll
+    Clipboard := ""
+
+    Send ^c
+    ClipWait, 0.3
+    if ErrorLevel
+    {
+        MB("复制失败")
+        Clipboard := ClipSaved
+        Return
+    }
+
+    cliped := Clipboard
+    Clipboard := ClipSaved
+
+    paths := []
+
+    ; 解析剪贴板内容，支持多行（多个文件）
+    Loop, Parse, cliped, `n, `r
+    {
+        if A_LoopField  ; 如果行不为空
+            paths.Push(A_LoopField)
+    }
+
+    CreateShortcuts(paths)
+Return
+
+^!F::
+    t := GetSelectedText()
+    If (t == "")
+        t := IB("What To Search?", "Everything")
+    MB(EQuery(t))
+Return
+
 ^!S:: ; ctrl + shift + s -> bing 搜索选中的文本
     RunUrl("Search", POOL_STATIC.bingSearch) ; sc -> search
 Return
@@ -237,7 +267,7 @@ Return
 #IfWinActive ahk_exe studio64.exe
     !+f::
         Send ^!l
-    return
+    Return
     ::bd::
         SendInput, Build APK(s)
     Return
@@ -349,9 +379,9 @@ Translate(bingKey := "", deeplKey := "")
 RunUrl(title, url)
 {
     content := GetSelectedText()
-    if ( RegExReplace(content, "\s") == "")
+    if (RegExReplace(content, "\s") == "")
     {
-        InputBox content, %title%, What To %title%?, , 330, 130
+        content := IB("What To " . title "?", title)
         if (content == "")
             Return
     }
@@ -378,7 +408,11 @@ RunWithSplashText(path)
         child := FindLastChild(path)
         re := EQuery(child)
         If (re)
-            MB("找到了: " . re)
+        {
+            Clipboard := re
+            MB("找到了: " . re . " , 已复制到剪贴板")
+            RunAhk(EditorPath, password . " " . lastReloadTime)
+        }
         Else
             MB("在此计算机上找不到: " . path)
     }

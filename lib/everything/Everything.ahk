@@ -33,23 +33,23 @@ global E_FILE_NAME = 0x00000001 ; 仅名字
     , E_HIGHLIGHTED_PATH = 0x00004000 ; 没啥用
     , E_HIGHLIGHTED_FULL_PATH_AND_FILE_NAME = 0x00008000 ; 没啥用
 
-    , E_OK :=	0	; The operation completed successfully.
-    , E_ERROR_MEMORY :=	1 ;	Failed to allocate memory for the search query.
-    , E_ERROR_IPC :=	2 ;	IPC is not available.
-    , E_ERROR_REGISTERCLASSEX :=	3 ;	Failed to register the search query window class.
-    , E_ERROR_CREATEWINDOW :=	4 ;	Failed to create the search query window.
-    , E_ERROR_CREATETHREAD :=	5 ;	Failed to create the search query thread.
-    , E_ERROR_INVALIDINDEX :=	6 ;	Invalid index. The index must be greater or equal to 0 and less than the number of visible results.
-    , E_ERROR_INVALIDCALL :=	7 ;	Invalid call.
+    , E_OK :=	0	; 操作已成功完成
+    , E_ERROR_MEMORY :=	1 ;	无法为搜索查询分配内存
+    , E_ERROR_IPC :=	2 ;	IPC不可用
+    , E_ERROR_REGISTERCLASSEX :=	3 ;	无法注册搜索查询窗口类
+    , E_ERROR_CREATEWINDOW :=	4 ;	无法创建搜索查询窗口
+    , E_ERROR_CREATETHREAD :=	5 ;	无法创建搜索查询线程
+    , E_ERROR_INVALIDINDEX :=	6 ;	索引无效， 索引必须大于或等于 0 且小于可见结果的数量
+    , E_ERROR_INVALIDCALL :=	7 ;	无效的调用
 
 global E_maxLen := 256
     , E_defaultFlags := (E_EXTENSION | E_FULL_PATH_AND_FILE_NAME)
 
     ; 以下的完整路径设置是必要的
-    , E_pth := "Everything" . (A_Is64bitOS ? "64.dll" : "32.dll")
+    , E_pth := A_ScriptDir . "\lib\everything\Everything" . (A_Is64bitOS ? "64.dll" : "32.dll")
     , E_func := E_pth . "\Everything_"
 
-; 调用 everything dll 搜索关键字并返回收个路径
+; 调用 everything dll 搜索关键字并返回首个路径
 EQuery(keywords)
 {
     Try
@@ -200,6 +200,11 @@ class Everything {
     ; 加载 everything dll 至内存
     _LoadDll()
     {
+        If (!FileExist(E_pth))
+        {
+            MsgBox % "在" . E_pth . " 下找不到 everything dll"
+            Return
+        }
         this.dllModule := DllCall("LoadLibrary", "Str", E_pth, "Ptr")
     }
 

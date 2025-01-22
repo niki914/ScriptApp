@@ -14,6 +14,43 @@
 #Include %A_ScriptDir%\lib\text\Text.ahk
 global XOR_DLL_PATH := "lib\my_dll\XOR.dll\"
 
+CreateShortcuts(paths)
+{
+    failedPaths := []
+
+    for index, path in paths
+    {
+        If (!CreateShortcut(path))
+        {
+            failedPaths.Push(path)
+        }
+    }
+
+    If (!failedPaths.Length())
+        Return 1
+    Return failedPaths
+}
+
+CreateShortcut(path)
+{
+    If (!FileExist(path))
+        Return 0
+
+    FileGetAttrib, attr, %path% ; 属性
+    SplitPath, path, , dir, , name_no_ext
+
+    try
+    {
+        FileCreateShortcut, %path%, %A_Desktop%\%name_no_ext%.lnk
+    }
+    catch
+    {
+        Return 0
+    }
+
+    Return 1
+}
+
 WriteStringToFile(path, str)
 {
     file := GetEmptyFile(path)
