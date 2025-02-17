@@ -27,7 +27,7 @@ RunCmd(command, timeout := 0.25)
 
     Clipboard := "" ; 清除
 
-    Run % ComSpec " /c " . command . " | CLIP", , Hide
+    Run % ComSpec " /c chcp 65001 && " . command . " | CLIP", , Hide
     ClipWait, timeout
 
     result := Clipboard

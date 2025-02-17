@@ -58,6 +58,8 @@ OnMessage(0x11, "OnSystemLogoff")
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
 
+RunAhk(A_ScriptDir . "\ADB-UDP.ahk")
+
 Return
 
 ; 当系统关机, 注销或休眠, 实测是有回调的, 但是无法阻止这个进程 (网上的文章是可以的, 原因未知)
@@ -84,13 +86,7 @@ OnSystemLogoff(wParam, lParam)
 ; Return
 
 ::adb::
-    ip := IB("输入安卓手机的ip", "adb")
-    If (ip)
-    {
-        adbResult := RunCmd("adb connect " + ip, 5)
-        ST_Show(adbResult, "", 1000)
-    }
-
+    RunAhk(A_ScriptDir . "\ADB-UDP.ahk")
 Return
 
 ::pg::

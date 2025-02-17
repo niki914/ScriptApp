@@ -21,7 +21,7 @@ SendMode Input
 
 global stay := 1500
 
-FT_Show("win cast is on!{RCTRL}", stay)
+FT_Show("win cast is on! {RCTRL}", stay)
 Return
 
 RCtrl::RWin
