@@ -23,6 +23,8 @@ Thread, Interrupt, 0
 ; 加快脚本运行速度的设置
 
 RunThisAsAdmin()
+RunAhk(A_ScriptDir . "\AdbService.ahk")
+RunAhk(A_ScriptDir . "\IntroduceService.ahk")
 
 global fileContents := {}
     , manifest := []
@@ -34,7 +36,6 @@ global fileContents := {}
 ReadConfigsToScript(password, fileContents, manifest, lastReloadTime)
 
 adminType := A_IsAdmin ? "(admin)" : ""
-FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
 For index, value in manifest
 {
@@ -57,8 +58,7 @@ OnMessage(0x11, "OnSystemLogoff")
 
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
-
-RunAhk(A_ScriptDir . "\ADB-UDP.ahk")
+FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
 Return
 
@@ -86,7 +86,7 @@ OnSystemLogoff(wParam, lParam)
 ; Return
 
 ::adb::
-    RunAhk(A_ScriptDir . "\ADB-UDP.ahk")
+    RunAhk(A_ScriptDir . "\AdbService_port5555.ahk")
 Return
 
 ::pg::

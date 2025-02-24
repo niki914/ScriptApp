@@ -257,14 +257,7 @@ class Socket {
 	}
 
 	GetAddrInfo(Address) {
-		__ := ["127.0.0.1", "0.0.0.0", "255.255.255.255", "::1", "::", "FF00::"]
-		conv := {localhost:__[1], addr_loopback:__[1], inaddr_loopback:__[1], addr_any:__[2], inaddr_any:__[2], addr_broadcast:__[3]
-		, inaddr_broadcast:__[3], addr_none:__[3], inaddr_none:__[3], localhost6:__[4], addr_loopback6:__[4], inaddr_loopback6:__[4]
-		, addr_any6:__[5], inaddr_any:__[5], addr_broadcast6:__[6], inaddr_broadcast6:__[6], addr_none6:__[6], inaddr_none6:__[6]}
-		; TODO: Use GetAddrInfoW
 		Host := Address[1], Port := Address[2]
-		if (conv[host])
-			host := conv[host]
 		VarSetCapacity(Hints, 16+(4*A_PtrSize), 0)
 		, NumPut(this.SocketType, Hints, 8, "int")
 		, NumPut(this.ProtocolId, Hints, 12, "int")
