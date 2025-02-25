@@ -17,7 +17,7 @@ global ssid_GDUT := "gdut"
 GDUT_KeepAlive()
 {
     Gosub, Tag_GDUT
-    SetTimer, Tag_GDUT, 10000
+    SetTimer, Tag_GDUT, 5000
     Return
 
     Tag_GDUT:
@@ -26,8 +26,8 @@ GDUT_KeepAlive()
     isDone_GDUT := False
     pingCode_GDUT := Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 3)
 
-    If (pingCode_GDUT == 0 && GetCurrentWifi() == "gdut")
-        GDUT_Login()
+    If (pingCode_GDUT == 0 )
+        GDUT()
     isDone_GDUT := True
     Return
 }
@@ -41,9 +41,12 @@ GDUT()
 {
     Loop % retryCount_GDUT
     {
-        If(GDUT_Connect())
+        If(GDUT_Connect()){
+            Sleep, 500
             Return GDUT_Login()
-        Sleep, 200
+        }else{
+            Sleep, 200
+        }
     }
     Return "gdut wifi was not connected"
 }
@@ -51,12 +54,13 @@ GDUT()
 ; 连接 gdut wifi
 GDUT_Connect()
 {
-    If (!IsWifiNear(ssid_GDUT))
+    If (!IsWifiNear(ssid_GDUT) || !IsWifiOn())
         Return False
     Loop % retryCount_GDUT
     {
         If (IsWifiConnected(ssid_GDUT))
             Return True
+        ConnectWifi(ssid_GDUT)
         Sleep, 200
     }
     Return False ; 尝试无果

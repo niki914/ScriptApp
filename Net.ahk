@@ -131,6 +131,11 @@ GetIP(expect := 10)
     return currentIP
 }
 
+IsWifiOn()
+{
+    Return RunCmdWithExpect("netsh wlan show interfaces", "软件 开")
+}
+
 IsWifiNear(ssid)
 {
     Return RunCmdWithExpect("netsh wlan show networks mode=bssid", ssid)
