@@ -41,10 +41,13 @@ GDUT()
 {
     Loop % retryCount_GDUT
     {
-        If(GDUT_Connect()){
+        If(GDUT_Connect())
+        {
             Sleep, 500
             Return GDUT_Login()
-        }else{
+        }
+        else
+        {
             Sleep, 200
         }
     }
@@ -55,11 +58,15 @@ GDUT()
 GDUT_Connect()
 {
     If (!IsWifiNear(ssid_GDUT) || !IsWifiOn())
+    {
         Return False
+    }
     Loop % retryCount_GDUT
     {
         If (IsWifiConnected(ssid_GDUT))
+        {
             Return True
+        }
         ConnectWifi(ssid_GDUT)
         Sleep, 200
     }

@@ -37,7 +37,7 @@ RunCmd(command,  timeout:=0.25, ByRef nExitCode:=0) {
         } ; Pipe buffer is not empty, so we can read it.
         VarSetCapacity(sTemp, nTot + 1)
         DllCall("ReadFile", Ptr, hStdOutRd, Ptr, &sTemp, UInt, nTot, PtrP, nSize, Ptr, 0)
-        outputStr .= StrGet(&sTemp, nSize, "UTF-8")
+        outputStr .= StrGet(&sTemp, nSize, "CP0")
     }
 
     ; * SKAN has managed the exit code through SetLastError.

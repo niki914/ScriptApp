@@ -133,32 +133,38 @@ GetIP(expect := 10)
 
 IsWifiOn()
 {
-    Return RunCmdWithExpect("netsh wlan show interfaces", "软件 开")
+    r0 := RunCmd("netsh wlan show interfaces")
+    r := (IsTextIncluding(r0, "已连接") || IsTextIncluding(r0, "软件 开"))
+    Return r
 }
 
 IsWifiNear(ssid)
 {
-    Return RunCmdWithExpect("netsh wlan show networks mode=bssid", ssid)
+    r := RunCmdWithExpect("netsh wlan show networks mode=bssid", ssid)
+    Return r
 }
 
 IsWifiConnected(ssid)
 {
-    Return GetCurrentWifi() = ssid
+    r := (GetCurrentWifi() == ssid)
+    Return r
 }
 
 GetCurrentWifi()
 {
-    result := RunCmd("netsh wlan show interfaces")
-    Return FilterText(result, "SSID\s+:\s(.+)") ; "" 则是未连接
+    r := RunCmd("netsh wlan show interfaces")
+    Return FilterText(r, "SSID\s+:\s(.+)") ; "" 则是未连接
 }
 
 ConnectWifi(ssid)
 {
-    Return RunCmdWithExpect("netsh wlan connect name=" . ssid, "已")
+    r := RunCmdWithExpect("netsh wlan connect name=" . ssid, "已")
+    Return r
 }
 
 ; 展示结果
 DisconnectWifi()
 {
-    Return RunCmd("netsh wlan disconnect")
+    r := RunCmd("netsh wlan disconnect")
+    Return r
 }

@@ -58,6 +58,7 @@ OnMessage(0x11, "OnSystemLogoff")
 
 If (studentNumber && studentPassword)
     GDUT_KeepAlive()
+
 FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
 Return
