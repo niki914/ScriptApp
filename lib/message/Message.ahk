@@ -46,6 +46,14 @@ MB(message, title := "")
   MsgBox, 262144, %title%, %message%
 }
 
+CB(message, title := "") {
+  MsgBox, 1, %title%, %message%
+  IfMsgBox, OK
+    return 1
+else
+  return 0
+}
+
 ; 要求输入
 IB(message, title := "", hide := False)
 {

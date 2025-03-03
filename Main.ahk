@@ -99,7 +99,7 @@ Return
 Return
 
 ::md::
-    name := IB("为 Markdown 文件命名:")
+    name := IB("新建 Markdown 文件命名:")
     If (name == "")
         Return
     mdPath := A_Desktop . "\" . name . ".md"
@@ -253,6 +253,20 @@ Return
 Alt & x:: ; 右键点击事件
     SendInput {AppsKey}
 Return
+
+#IfWinActive ahk_exe typora.exe
+    ^D::
+        t := GetSelectedText()
+        filtered := FilterText(t, "\]\((images/.+?\..+?)\)")
+        child := FindLastChild(filtered)
+        re := EQuery(child)
+        If (FileExist(re) && re)
+        {
+            If (CB("是否删除" . child))
+                FileDelete, %re%
+        }
+    Return
+#IfWinActive
 
 ; 相互映射 [代码格式化] 快捷键
 #IfWinActive ahk_exe Code.exe

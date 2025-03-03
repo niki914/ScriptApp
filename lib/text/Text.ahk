@@ -14,7 +14,7 @@
 FindLastChild(path)
 {
     s := Trim(path, " \/`n")
-    re := FilterText(s, "((?<=\\)[^\\]*$)")
+    re := FilterText(s, "((?<=\\|/)[^\\/]*$)")
     Return re ? re : path
 }
 
