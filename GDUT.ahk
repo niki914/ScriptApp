@@ -26,8 +26,8 @@ GDUT_KeepAlive()
     isDone_GDUT := False
     pingCode_GDUT := Ping("https://connectivitycheck.platform.hicloud.com/generate_204", 3)
 
-    If (pingCode_GDUT == 0 )
-        GDUT()
+    If (pingCode_GDUT == 0)
+        FT_Show(GDUT(), 1000)
     isDone_GDUT := True
     Return
 }
@@ -81,7 +81,7 @@ GDUT_Login()
         MB("还未设置校园网 baseurl, 请看 main.ahk 中的 loginHeadUrl 参数")
         Return ""
     }
-    url := loginHeadUrl . GetIP("10") . loginTailUrl
+    url := loginHeadUrl . GetIP("10")["WLAN"] . loginTailUrl
     result := GetRequest(url)
     msg := FilterText(result.text, "i)""msg""\s*:\s*""(.+?)""")
     Return msg

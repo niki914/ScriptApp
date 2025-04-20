@@ -114,21 +114,62 @@ GetIP(expect := 10)
 
     ; 查询所有启用了IP的网络适配器配置
     colItems := objWMIService.ExecQuery("Select * from Win32_NetworkAdapterConfiguration WHERE IPEnabled = True")._NewEnum
-    currentIP := ""
+    ip := ""
+    result := {}
 
     ; 遍历网络适配器
     while colItems[objItem]
     {
         ; 获取当前IP地址
-        currentIP := objItem.IPAddress[0]
+        ip := objItem.IPAddress[0]
+        adapterIndex := objItem.SettingID
+
+        ; 查询对应的网络适配器信息
+        adapterQuery := objWMIService.ExecQuery("Select * from Win32_NetworkAdapter WHERE GUID = '" adapterIndex "'")._NewEnum
+
+        name := "unknown"
+        if (adapterQuery[adapter])
+            name := adapter.NetConnectionID
 
         ; 检查IP是否以期望的前缀开头
-        if (SubStr(currentIP, 1, StrLen(expect)) = expect)
-            return currentIP
+        if (SubStr(ip, 1, StrLen(expect)) = expect)
+        {
+            Return ip
+            result[name] := ip
+            ; MB(result.Length())
+        }
     }
 
-    ; 如果没有找到匹配的IP，返回空字符串
-    return currentIP
+    ; todo: fix and adjust
+    If (result.Length() == 0)
+        Return ip
+    Return ip
+    return result
+}
+
+GetAdapters()
+{
+    ; 使用WMI（Windows Management Instrumentation）连接到Windows系统的管理接口
+    objWMIService := ComObjGet("winmgmts:{impersonationLevel = impersonate}!\\.\root\cimv2")
+
+    ; 查询所有启用了IP的网络适配器配置
+    colItems := objWMIService.ExecQuery("Select * from Win32_NetworkAdapterConfiguration WHERE IPEnabled = True")._NewEnum
+    currentIP := ""
+    result := []
+
+    ; 遍历网络适配器
+    while colItems[objItem]
+    {
+        adapterIndex := objItem.SettingID
+
+        ; 查询对应的网络适配器信息
+        adapterQuery := objWMIService.ExecQuery("Select * from Win32_NetworkAdapter WHERE GUID = '" adapterIndex "'")._NewEnum
+        if (adapterQuery[adapter])
+        {
+            result.Push(adapter.NetConnectionID)
+        }
+    }
+    Return result
 }
 
 IsWifiOn()

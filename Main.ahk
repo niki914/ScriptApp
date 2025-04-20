@@ -24,7 +24,7 @@ Thread, Interrupt, 0
 
 RunThisAsAdmin()
 RunAhk(A_ScriptDir . "\AdbService.ahk")
-RunAhk(A_ScriptDir . "\IntroduceService.ahk")
+; RunAhk(A_ScriptDir . "\IntroduceService.ahk")
 
 global fileContents := {}
     , manifest := []
@@ -61,6 +61,12 @@ If (studentNumber && studentPassword)
 
 FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
+; ips := GetIP(1)
+; for key, value in ips
+; {
+;     MB(key . value)
+; }
+
 Return
 
 ; 当系统关机, 注销或休眠, 实测是有回调的, 但是无法阻止这个进程 (网上的文章是可以的, 原因未知)
@@ -87,7 +93,10 @@ OnSystemLogoff(wParam, lParam)
 ; Return
 
 ::adb::
-    RunAhk(A_ScriptDir . "\AdbService_port5555.ahk")
+    androidIp := IB("enter ip for adb","adb")
+    Clipboard := androidIp
+    adbResult := RunCmd("adb connect " . androidIp . ":" . "5555", 20)
+    FT_Show(adbResult, 3000)
 Return
 
 ::pg::
@@ -106,6 +115,7 @@ Return
     GetEmptyFile(mdPath).Close()
     RunWithSplashText(mdPath)
 Return
+
 
 ::lh::
     RunPenetration("1234")
