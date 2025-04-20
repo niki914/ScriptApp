@@ -106,6 +106,7 @@ Return
     GetEmptyFile(mdPath).Close()
     RunWithSplashText(mdPath)
 Return
+
 ::lh::
     RunPenetration("1234")
 Return
@@ -263,7 +264,12 @@ Return
         If (FileExist(re) && re)
         {
             If (CB("是否删除" . child))
+            {
                 FileDelete, %re%
+                Clipboard := "" ; 清除
+                Send, ^x
+                ClipWait, 0.3
+            }
         }
     Return
 #IfWinActive
@@ -275,7 +281,8 @@ Return
     return
 #IfWinActive
 
-#IfWinActive ahk_exe studio64.exe
+#IfWinActive ahk_exe studio64.exe 
+#IfWinActive ahk_exe idea64.exe
     !+f::
         Send ^!l
     Return
