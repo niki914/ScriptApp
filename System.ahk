@@ -11,7 +11,7 @@ RunCmdWithExpect(command, expect, timeout := 0.25)
     Return IsTextIncluding(RunCmd(command, timeout), expect)
 }
 
-RunCmd(command,  timeout:=0.25, ByRef nExitCode:=0) {
+RunCmd(command,  timeout:=0.25, encoding := "CP0") {
     DllCall("CreatePipe", PtrP, hStdOutRd, PtrP, hStdOutWr, Ptr, 0, UInt, 0)
     DllCall("SetHandleInformation", Ptr,hStdOutWr, UInt,1, UInt,1)
     VarSetCapacity(pi, (A_PtrSize == 4) ? 16 : 24, 0)
@@ -37,7 +37,7 @@ RunCmd(command,  timeout:=0.25, ByRef nExitCode:=0) {
         } ; Pipe buffer is not empty, so we can read it.
         VarSetCapacity(sTemp, nTot + 1)
         DllCall("ReadFile", Ptr, hStdOutRd, Ptr, &sTemp, UInt, nTot, PtrP, nSize, Ptr, 0)
-        outputStr .= StrGet(&sTemp, nSize, "UTF-8")
+        outputStr .= StrGet(&sTemp, nSize, encoding)
     }
 
     ; * SKAN has managed the exit code through SetLastError.
@@ -48,30 +48,30 @@ RunCmd(command,  timeout:=0.25, ByRef nExitCode:=0) {
     Return Trim(outputStr," `n`r`t")
 }
 
-; 运行 cmd 命令并返回运行结果
-; 注意, 耗时的 cmd 指令可能会导致延迟返回等奇怪问题
-; 会影响剪贴板的使用
-global isRunning_System := False
-RunCmd1(command, timeout := 0.25)
-{
-    If (!command)
-        Return ""
-    While (isRunning_System)
-        Sleep, 1
-    isRunning_System := True
+; ; 运行 cmd 命令并返回运行结果
+; ; 注意, 耗时的 cmd 指令可能会导致延迟返回等奇怪问题
+; ; 会影响剪贴板的使用
+; global isRunning_System := False
+; RunCmd1(command, timeout := 0.25)
+; {
+;     If (!command)
+;         Return ""
+;     While (isRunning_System)
+;         Sleep, 1
+;     isRunning_System := True
 
-    ClipSaved := ClipboardAll ; 把剪贴板的所有内容 (任何格式)
+;     ClipSaved := ClipboardAll ; 把剪贴板的所有内容 (任何格式)
 
-    Clipboard := "" ; 清除
+;     Clipboard := "" ; 清除
 
-    Run % ComSpec " /c chcp 65001 && " . command . " | CLIP", , Hide
-    ClipWait, timeout
+;     Run % ComSpec " /c chcp 65001 && " . command . " | CLIP", , Hide
+;     ClipWait, timeout
 
-    result := Clipboard
-    Clipboard := ClipSaved ; 使用 Clipboard (不是 ClipboardAll)
-    isRunning_System := False
-    Return result
-}
+;     result := Clipboard
+;     Clipboard := ClipSaved ; 使用 Clipboard (不是 ClipboardAll)
+;     isRunning_System := False
+;     Return result
+; }
 
 RunThisAsAdmin()
 {

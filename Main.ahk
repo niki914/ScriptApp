@@ -61,7 +61,7 @@ If (studentNumber && studentPassword)
 
 FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
-; ips := GetIP(1)
+; ips := GetIP()
 ; for key, value in ips
 ; {
 ;     MB(key . value)
@@ -115,7 +115,6 @@ Return
     GetEmptyFile(mdPath).Close()
     RunWithSplashText(mdPath)
 Return
-
 
 ::lh::
     RunPenetration("1234")
@@ -291,7 +290,7 @@ Return
     return
 #IfWinActive
 
-#IfWinActive ahk_exe studio64.exe 
+#IfWinActive ahk_exe studio64.exe
 #IfWinActive ahk_exe idea64.exe
     !+f::
         Send ^!l
