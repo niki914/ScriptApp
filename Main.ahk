@@ -176,6 +176,24 @@ Return
     ST_Show(GDUT(), "gdut", 800)
 Return
 
+::ex::
+ExitApp
+
+; 本机高级系统属性
+::se::
+    Run sysdm.cpl
+Return
+
+; 重启资源管理器
+::rf::
+    RunWait %ComSpec% /c taskkill /f /im explorer.exe & start explorer.exe, , Hide
+Return
+
+; 使本机睡眠
+::sl::
+    DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
+Return
+
 ;----以下是快捷键----
 
 !d::
@@ -260,7 +278,7 @@ Return
     Run %vsPAth% %A_ScriptDir%
 Return
 
-Alt & x:: ; 右键点击事件
+!x:: ; 右键点击事件
     SendInput {AppsKey}
 Return
 
@@ -572,22 +590,4 @@ RunPenetration(port := "3000")
 ; ; 脚本目录
 ; ::app::
 ;     Run % A_ScriptDir
-; Return
-
-; ::ex::
-; ExitApp
-
-; 本机高级系统属性
-; ::se::
-;     Run sysdm.cpl
-; Return
-
-; ; 重启资源管理器
-; ::rf::
-;     RunWait %ComSpec% /c taskkill /f /im explorer.exe & start explorer.exe, , Hide
-; Return
-
-; ; 使本机睡眠
-; ::sl::
-;     DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
 ; Return
