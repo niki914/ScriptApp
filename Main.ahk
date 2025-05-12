@@ -196,6 +196,71 @@ Return
 
 ;----以下是快捷键----
 
+!m::
+    ClipSaved := ClipboardAll
+    Clipboard := ""
+
+    ; 复制选中的文件/文件夹路径
+    Send ^c
+    ClipWait, 0.3
+    if ErrorLevel
+    {
+        MsgBox, 复制失败
+        Clipboard := ClipSaved
+        return
+    }
+
+    cliped := Clipboard
+    Clipboard := ClipSaved
+
+    ; 解析剪贴板内容，支持多行（多个文件/文件夹）
+    paths := []
+    Loop, Parse, cliped, `n, `r
+    {
+        if A_LoopField
+            paths.Push(A_LoopField)
+    }
+
+    ; 检查是否选中路径
+    if (paths.Length() = 0)
+    {
+        MsgBox, 未选中任何文件或文件夹
+        return
+    }
+
+    ; 仅处理第一个选中的路径
+    sourcePath := paths[1]
+
+    ; 检查源路径是否存在
+    if !FileExist(sourcePath)
+    {
+        MsgBox, 源路径不存在: %sourcePath%
+        return
+    }
+
+    ; 获取源文件/文件夹的名称
+    SplitPath, sourcePath, sourceName
+
+    inputPath := IB("输入映射路径")
+
+    ; 检查源路径是文件还是文件夹
+    FileGetAttrib, attribs, %sourcePath%
+    isDir := InStr(attribs, "D") ? 1 : 0
+
+    targetPath := """" . inputPath . """"
+    sourcePath := """" . sourcePath . """"
+
+    ; 构造 mklink 命令
+    If (isDir)
+        cmd := "mklink /D " . targetPath . " " . sourcePath
+    Else
+        cmd := "mklink " . targetPath . " " . sourcePath
+
+    ; 执行 mklink 命令
+    result := RunCmd(cmd)
+
+    MB(result)
+
 !d::
     ClipSaved := ClipboardAll
     Clipboard := ""
@@ -308,8 +373,7 @@ Return
     return
 #IfWinActive
 
-#IfWinActive ahk_exe studio64.exe
-#IfWinActive ahk_exe idea64.exe
+#IfWinActive ahk_exe idea64.exe || ahk_exe studio64.exe
     !+f::
         Send ^!l
     Return

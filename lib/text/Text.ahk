@@ -10,6 +10,7 @@
 ; RunFolder(funcInstance, path := "")
 ; RunFuncForDirectory(path, funcInstance, ByRef result)
 
+
 ; 查找路径字串的最后一个子项
 FindLastChild(path)
 {
