@@ -23,7 +23,7 @@ Thread, Interrupt, 0
 ; 加快脚本运行速度的设置
 
 RunThisAsAdmin()
-RunAhk(A_ScriptDir . "\AdbService.ahk")
+; RunAhk(A_ScriptDir . "\AdbService.ahk")
 ; RunAhk(A_ScriptDir . "\IntroduceService.ahk")
 
 global fileContents := {}
@@ -56,8 +56,8 @@ loginTailUrl := POOL_STATIC["login4"]
 
 OnMessage(0x11, "OnSystemLogoff")
 
-If (studentNumber && studentPassword)
-    GDUT_KeepAlive()
+; If (studentNumber && studentPassword)
+; GDUT_KeepAlive()
 
 FT_Show("hello! " . A_UserName . " " . adminType, 1500)
 
@@ -287,6 +287,39 @@ Return
     }
 
     CreateShortcuts(paths)
+Return
+
+!i::
+    ClipSaved := ClipboardAll
+    Clipboard := ""
+
+    Send ^c
+    ClipWait, 0.3
+    if ErrorLevel
+    {
+        MB("复制失败")
+        Clipboard := ClipSaved
+        Return
+    }
+
+    cliped := Clipboard
+    Clipboard := ClipSaved
+
+    paths := []
+
+    ; 解析剪贴板内容，支持多行（多个文件）
+    Loop, Parse, cliped, `n, `r
+    {
+        path := A_LoopField
+        if (path && InStr(path, ".apk", false)) ; 如果行不为空
+        {
+            r := RunCmd("adb install """ . path . """")
+            if r
+            {
+                MB(r, "ADB 安装")
+            }
+        }
+    }
 Return
 
 ^!F::
